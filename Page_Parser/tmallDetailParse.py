@@ -9,6 +9,7 @@ import re
 import time
 from bs4 import BeautifulSoup
 
+# var *ParseTime* needs a new source to indicate the real scrape time
 def reportTmallParseResult(shopRate,shopName,shopURL,shopAge,shopArea,itemName,itemDesc,attrList,orginPrice,promoPrice,imageURL,indInfo,inJu,colleNum):
     repo = {
     'parseTime':time.time(),
