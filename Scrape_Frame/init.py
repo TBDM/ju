@@ -36,7 +36,7 @@ def page():
 	return int(list_num)
 
 def filtrate(mongoClient, redis0Client, num):
-	juBulk = mongoClient.juTESTOD.ju.initialize_unordered_bulk_op()
+	juBulk = mongoClient.juList.ju.initialize_unordered_bulk_op()
 	redisPipe = redis0Client.pipeline()
 	data = urllib.request.urlopen('https://ju.taobao.com/tg/forecast.htm?page=' + str(num)).read().decode('gbk')
 	'''
@@ -49,7 +49,7 @@ def filtrate(mongoClient, redis0Client, num):
 		juBulk.find({'ju_id' : item[0], 'item_id' : item[1]}).upsert().update_one(
 			{'$setOnInsert' : {'schedule_time' : 0, 'status' : 0}})
 		#redisPipeline.zadd(SortedSetName, Score, String containing juId/itemId/Status delimited by '/')
-		redisPipe.zadd('juListOD', 0, item[0] + '/' + item[1] + '/' + '0')
+		redisPipe.zadd('juList', 0, item[0] + '/' + item[1] + '/' + '0')
 		'''
 		if(not juDb.ju.find_one({'ju_id' : item[0]})):
 			item_num = item_num + 1
@@ -65,13 +65,13 @@ def filtrate(mongoClient, redis0Client, num):
 		print('No ju-item found: ', _Einvo)
 		item_num = 0
 	except Exception as _Eall:
-		#TODO: Deal with other exceptions
+		#TODO: deal with other exceptions
 		item_num = 0
 		pass
 	try:
 		redisPipe.execute()
 	except Exception as _Eall:
-		#TODO: Deal with exceptions
+		#TODO: deal with exceptions
 		pass
 	return item_num
 
