@@ -15,7 +15,6 @@ from tbdmPrivacy import tbdmDatabase
 
 #----------global variables----------
 
-#----------global variables----------
 """
 @param:
 	tbdmDb 		tbdmDatabase instance.
@@ -24,9 +23,12 @@ from tbdmPrivacy import tbdmDatabase
 	redis0Cli	Redis connections to db0. This can be maintained by the manager in future, 
 						'cause py-redis(2.10.5) instances are thread-safe. 
 """
+#Workers maintain their own connections
 tbdmDb = tbdmDatabase()
 mongoCli = tbdmDb.tbdmMongo(addrOwner = 'jbtan')
 redis0Cli = tbdmDb.tbdmRedis(addrOwner = 'jbtan', connDb = 0, auth = True)
+
+#----------global variables----------
 
 #----------class definition----------
 
