@@ -28,7 +28,7 @@ mongoCli = tbdmDb.tbdmMongo(addrOwner = 'xhuang', authDb = 'tbdm')
 mongod = mongoCli.tbdm
 slacker = tbdmSlack()
 
-SLEEP_DURATION = 540 # This should be a const : )
+SLEEP_DURATION = 360 # This should be a const : )
 
 #----------global variables----------
 

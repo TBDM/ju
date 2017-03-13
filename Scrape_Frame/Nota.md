@@ -9,3 +9,5 @@
 + 7. [FIN] don't use += for penality time!
 + 8. [FIN] several coding issues with Ubuntu-env, do check.
 + 9. [FIN] Add at least 30 secs for Pipe-tasktime-halting.
++ 10. [FIN] Use *timer* instead of *time* for halting in case that process never awake for low priority.
++ 11. [FIN] Rebuild the Indicating-Section.
