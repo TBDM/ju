@@ -1,3 +1,14 @@
-/Scrape_Frame/tbdmPrivacy.py
-__pycache__/
 !.gitignore
+*.pyc
+__pycache__/
+
+2017*/
+*-test/
+
+*.log
+*.tblog
+*.lock
+*.html
+tbdmPrivacy.*
+tbdmConfig.*
+tbdmSetting.*
