@@ -24,13 +24,13 @@ def filter_html(filename):
 		#filter patterns
 		try:
 			rx = re.compile('|'.join(patterns))
-			with open(filename, 'r') as f:
+			with open(filename, 'r', encoding = "utf-8") as f:
 				content = f.read()
 			content = rx.sub('', content)
 			nfilename = filename[:-5] + '-filtered.html'
-			with open(nfilename, 'w') as f2:
+			with open(nfilename, 'w', encoding = "utf-8") as f2:
 				f2.write(content)
-			# os.remove(filename)
+			os.remove(filename)
 		except Exception as _Eall:
 			filterlog.error("Filter Error:" + str(_Eall))
 			return None
@@ -39,4 +39,4 @@ def filter_html(filename):
 
 if __name__ == '__main__':
 	print('import me plz...')
-	filter_html('20170324/success/43043016730-1490351218-filtered.html')
+	# filter_html('20170324/success/43043016730-1490351218-filtered.html')

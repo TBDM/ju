@@ -12,3 +12,4 @@ __pycache__/
 tbdmPrivacy.*
 tbdmConfig.*
 tbdmSetting.*
+*.out

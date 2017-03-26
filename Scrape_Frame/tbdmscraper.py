@@ -279,7 +279,7 @@ def request_page(taskdicts):
                 if(retcode == 200):
                     task['urlType'] = reqseq
                     driver.get(url_arch[reqseq] + task['itemID'])
-                    with open(task['itemID'] + '.html', 'w') as f:
+                    with open(task['itemID'] + '.html', 'w', encoding = "utf-8") as f:
                         f.write(driver.page_source)
                     success_cnt += get_indicator(task, reqseq + 1, datestr)
                     time.sleep(10)
