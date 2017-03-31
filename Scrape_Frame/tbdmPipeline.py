@@ -131,14 +131,26 @@ class workPipeline():
 
 if __name__ == "__main__":
 	workpipe = workPipeline()
+	# try:
+	# 	# tbdmscraper.display.start()
+	# except Exception as _Eall:
+	# 	logger.critical("Manager reported an error " + str(_Eall))
+	# 	time.sleep(3)
+
 	while (not os.path.exists('stopPipe')):
 		try:
 			workpipe.manager()
 		except Exception as _Eall:
 			logger.critical("Manager reported an error " + str(_Eall))
 			time.sleep(3)
+			tbdmscraper.firefox_driver.quit()
+			# tbdmscraper.phantomjs_driver.quit()
+			# tbdmscraper.display.stop() 
 		else:
 			logger.info("Manager finished one round.")
+	tbdmscraper.firefox_driver.quit()
+	# tbdmscraper.phantomjs_driver.quit()
+	# tbdmscraper.display.stop() 
 	logger.warning("Manager stopped on detecting flag.")
 	slacker.post_message("Manager stopped on detecting flag.")
 

@@ -12,6 +12,9 @@ import sys
 import time
 import pickle
 import subprocess
+from selenium import webdriver
+# from pyvirtualdisplay import Display
+import requests
 
 # Import third-part models
 
@@ -20,6 +23,7 @@ import tbdmSPIndicator
 from tbdmSetting import tbdmDatabase
 from tbdmLogging import tbdmLogger
 from tbdmSlack import tbdmSlack
+import tbdmFilter
 
 #----------model import----------
 
@@ -32,6 +36,9 @@ redisCli = tbdmDb.tbdmRedis(addrOwner = 'xhuang', auth = True)
 mongoCli = tbdmDb.tbdmMongo(addrOwner = 'xhuang', authDb = 'tbdm')
 mongod = mongoCli.tbdm
 slacker = tbdmSlack()
+# display = Display(visible=0, size=(1440,900))
+# phantomjs_driver = webdriver.PhantomJS(executable_path=r'phantomjs')
+firefox_driver = webdriver.Firefox()
 
 PENALIZE_TIME = 21601 # 6h penalty time and 1s for fail mark
 task_keylist = ["juID", "itemID", "score", "status", "urlType", "fail"]
@@ -159,7 +166,7 @@ def str_to_time(is_taobao, timestr):
        
 def get_indicator(task, url, datestr):
     """
-    @author: P.Liu X.Huang
+    @author: P.Liu X.Huang L.Xuezhang
     """
     try:
         content = open(task['itemID'] + '.html', encoding = "utf-8").read()
@@ -176,20 +183,33 @@ def get_indicator(task, url, datestr):
             except Exception as _Eall:
                 worklog.error("Title-parsing error: " + str(_Eall))           
         if(not tbdmSPIndicator.nvwang_festa_indicate(content, task)):
-            if(re.search('参加聚划算', content)):
-                if(not re.search('</strong>后结束', content)):
-                    if(is_taobao):
-                        begin_time = str_to_time(1, re.search('<strong class="tb-ju-more">([\S ]*)</strong>参加聚划算', content).group(1))                
-                    else:
-                        begin_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后开始', content).group(1))
+            if(task['status'] < 2):
+                # if(not re.search('</strong>后结束', content)):
+                #     if(is_taobao):
+                #         begin_time = str_to_time(1, re.search('<strong class="tb-ju-more">([\S ]*)</strong>参加聚划算', content).group(1))                
+                #     else:
+                #         begin_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后开始', content).group(1))
+                #     if(task['status'] == 0):o
+                #         task['status'] += 1
+                #     task['score'] = begin_time
+                # else:
+                #     end_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后结束', content).group(1))   
+                #     if(task['status'] < 2):
+                #         task['status'] = 2
+                #     task['score'] = end_time
+                firefox_driver.get('https://detail.ju.taobao.com/home.htm?id=' + task['juID'])
+                data = firefox_driver.page_source
+                mix_time = re.findall('data-targettime="([0-9]{13})"', data)
+                if(re.findall('开抢', data)):
                     if(task['status'] == 0):
                         task['status'] += 1
-                    task['score'] = begin_time
-                else:
-                    end_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后结束', content).group(1))   
+                    task['score'] = int(mix_time[0]) // 1000
+                elif re.findall('还剩', data):
                     if(task['status'] < 2):
                         task['status'] = 2
-                    task['score'] = end_time
+                    task['score'] = int(mix_time[0]) // 1000
+                else:
+                    pass
             else:
                 if(task['status'] > 1):
                         task['status'] += 1
@@ -198,16 +218,17 @@ def get_indicator(task, url, datestr):
                     # Failure situation
                     task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
                     task['fail'] += 1
-                    worklog.error('Unexcepted indicating: ' + task['itemID'] + ',' + title + ',' + str(url) + ',' + 
+                    worklog.error('Unexcepted indicating: ' + task['itemID'] + ','+task['juID'] + ',' + title + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
                     subprocess.call(['mv', task['itemID'] + '.html', datestr + '/error/' + task['itemID']
-                                + '-' + str(int(time.time()))  + '.html'])
+                                + '-' + task[juID] + '-' + str(int(time.time()))  + '.html'])
                     return 0
         else:
             with open(datestr + '/NvwangFestItem_20170308.log','a', encoding = "utf-8") as f:
                 f.write(task['itemID'] + ',' + title + ',' + str(url) + "\n")
-        subprocess.call(['mv', task['itemID'] + '.html', datestr + '/success/' + task['itemID']
-                                + '-' + str(int(time.time())) + '.html'])
+        nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
+        subprocess.call(['mv', task['itemID'] + '.html', nfilename])
+        tbdmFilter.filter_html(nfilename)
         with open(datestr + '/success.log','a', encoding = "utf-8") as f:
             f.write(task['itemID'] + ',' + title + ',' + str(url) + ',' + str(task['score']) + "\n")
         worklog.info('sleep 10s')
@@ -259,6 +280,7 @@ def request_page(taskdicts):
                 if(retcode == 0):
                     task['urlType'] = reqseq
                     success_cnt += get_indicator(task, reqseq + 1, datestr)
+                    time.sleep(10)
                     break
                 else:
                     reqseq += 1
