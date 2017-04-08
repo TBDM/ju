@@ -13,7 +13,7 @@ import time
 import pickle
 import subprocess
 from selenium import webdriver
-# from pyvirtualdisplay import Display
+from pyvirtualdisplay import Display
 import requests
 
 # Import third-part models
@@ -36,7 +36,7 @@ redisCli = tbdmDb.tbdmRedis(addrOwner = 'xhuang', auth = True)
 mongoCli = tbdmDb.tbdmMongo(addrOwner = 'xhuang', authDb = 'tbdm')
 mongod = mongoCli.tbdm
 slacker = tbdmSlack()
-# display = Display(visible=0, size=(1440,900))
+display = Display(visible=0, size=(1440,900))
 # phantomjs_driver = webdriver.PhantomJS(executable_path=r'phantomjs')
 firefox_driver = webdriver.Firefox()
 
@@ -182,24 +182,25 @@ def get_indicator(task, url, datestr):
                     title = re.search('<h3 class="tb-main-title" data-title="([\S ]*)"', content).group(1) 
             except Exception as _Eall:
                 worklog.error("Title-parsing error: " + str(_Eall))           
-        if(not tbdmSPIndicator.nvwang_festa_indicate(content, task)):
-            if(task['status'] < 2):
-                # if(not re.search('</strong>后结束', content)):
-                #     if(is_taobao):
-                #         begin_time = str_to_time(1, re.search('<strong class="tb-ju-more">([\S ]*)</strong>参加聚划算', content).group(1))                
-                #     else:
-                #         begin_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后开始', content).group(1))
-                #     if(task['status'] == 0):o
-                #         task['status'] += 1
-                #     task['score'] = begin_time
-                # else:
-                #     end_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后结束', content).group(1))   
-                #     if(task['status'] < 2):
-                #         task['status'] = 2
-                #     task['score'] = end_time
-                firefox_driver.get('https://detail.ju.taobao.com/home.htm?id=' + task['juID'])
-                data = firefox_driver.page_source
-                mix_time = re.findall('data-targettime="([0-9]{13})"', data)
+        # if(not tbdmSPIndicator.nvwang_festa_indicate(content, task)):
+        if(task['status'] < 2):
+            # if(not re.search('</strong>后结束', content)):
+            #     if(is_taobao):
+            #         begin_time = str_to_time(1, re.search('<strong class="tb-ju-more">([\S ]*)</strong>参加聚划算', content).group(1))                
+            #     else:
+            #         begin_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后开始', content).group(1))
+            #     if(task['status'] == 0):o
+            #         task['status'] += 1
+            #     task['score'] = begin_time
+            # else:
+            #     end_time = str_to_time(0, re.search('<strong>([\S ]*)</strong>后结束', content).group(1))   
+            #     if(task['status'] < 2):
+            #         task['status'] = 2
+            #     task['score'] = end_time
+            firefox_driver.get('https://detail.ju.taobao.com/home.htm?id=' + task['juID'])
+            data = firefox_driver.page_source
+            mix_time = re.findall('data-targettime="([0-9]{13})"', data)
+            try:
                 if(re.findall('开抢', data)):
                     if(task['status'] == 0):
                         task['status'] += 1
@@ -208,24 +209,24 @@ def get_indicator(task, url, datestr):
                     if(task['status'] < 2):
                         task['status'] = 2
                     task['score'] = int(mix_time[0]) // 1000
-                else:
-                    pass
-            else:
-                if(task['status'] > 1):
-                        task['status'] += 1
-                        task['score'] += 86400 # Scrape on next day
-                else:
-                    # Failure situation
-                    task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
-                    task['fail'] += 1
-                    worklog.error('Unexcepted indicating: ' + task['itemID'] + ','+task['juID'] + ',' + title + ',' + str(url) + ',' + 
-                                    str(task['score']) + "\n")
-                    subprocess.call(['mv', task['itemID'] + '.html', datestr + '/error/' + task['itemID']
-                                + '-' + task[juID] + '-' + str(int(time.time()))  + '.html'])
-                    return 0
+            except Exception as _Eall:
+                worklog.error("Time-parsing error: " + str(_Eall)) 
         else:
-            with open(datestr + '/NvwangFestItem_20170308.log','a', encoding = "utf-8") as f:
-                f.write(task['itemID'] + ',' + title + ',' + str(url) + "\n")
+            if(task['status'] > 1):
+                    task['status'] += 1
+                    task['score'] += 86400 # Scrape on next day
+            else:
+                # Failure situation
+                task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+                task['fail'] += 1
+                worklog.error('Unexcepted indicating: ' + task['itemID'] + ','+task['juID'] + ',' + title + ',' + str(url) + ',' + 
+                                str(task['score']) + "\n")
+                subprocess.call(['mv', task['itemID'] + '.html', datestr + '/error/' + task['itemID']
+                            + '-' + task[juID] + '-' + str(int(time.time()))  + '.html'])
+                return 0
+        # else:
+        #     with open(datestr + '/NvwangFestItem_20170308.log','a', encoding = "utf-8") as f:
+        #         f.write(task['itemID'] + ',' + title + ',' + str(url) + "\n")
         nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
         subprocess.call(['mv', task['itemID'] + '.html', nfilename])
         tbdmFilter.filter_html(nfilename)
@@ -279,6 +280,7 @@ def request_page(taskdicts):
                 retcode =  subprocess.call(['phantomjs', 'spider.js', url_arch[reqseq] + task['itemID']])
                 if(retcode == 0):
                     task['urlType'] = reqseq
+                    time.sleep(5)
                     success_cnt += get_indicator(task, reqseq + 1, datestr)
                     time.sleep(10)
                     break
