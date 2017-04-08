@@ -11,6 +11,7 @@ import os
 import sys
 import time
 import pickle
+import traceback
 import subprocess
 
 # Import third-part models
@@ -143,19 +144,7 @@ class Worker():
         @author: P.Liu X.Huang L.Xuezhang
         """
         try:
-            content = self.firefox_driver.page_source
-            is_taobao = 0
-            title = ''
-            if(url == 2):
-                try:
-                    if(not re.search('<title>([\S ]*)淘宝网</title>', content)):
-                        is_taobao = 0
-                        title = re.search('<input type="hidden" name="title" value="([\S ]*)"', content).group(1)
-                    else:
-                        is_taobao = 1
-                        title = re.search('<h3 class="tb-main-title" data-title="([\S ]*)"', content).group(1) 
-                except Exception as _Eall:
-                    worklog.error("Title-parsing error: " + str(_Eall))           
+            content = self.firefox_driver.page_source        
             if (task['status'] > 1):
                 task['status'] += 1
                 task['score'] += 86400 # Scrape on next day                
@@ -164,26 +153,26 @@ class Worker():
                     # Failure situation
                     task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
                     task['fail'] += 1
-                    worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + title + ',' + str(url) + ',' + 
+                    worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
                     return 0
             nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
             self.save_gecko_page(nfilename)
             with open(datestr + '/success.log','a', encoding = "utf-8") as f:
-                f.write(task['itemID'] + ',' + title + ',' + str(url) + ',' + str(task['score']) + "\n")
+                f.write(task['itemID'] + ',' + str(url) + ',' + str(task['score']) + "\n")
             return 1
         except Exception:
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             task['fail'] += 1
             nfilename = datestr + '/error/' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename)
-            worklog.error('Fetch-parsing Error:' + task['itemID'] + ',' + title + ',' + str(url) + ',' + str(task['score']) + "\n")
+            worklog.error('Fetch-parsing Error:' + task['itemID'] + ',' + str(url) + ',' + str(task['score']) + "\n")
             return 0
 
     def juDetail_indicate(self, task, datestr):
         try:
             content = self.firefox_driver.page_source
-            item_source = re.findall('<a href="//(.*)&tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
+            item_source = re.findall('<a href="//(.*)tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
             if ('tmall.hk' in item_source):
                 task['urlType'] = 2
             elif ('chaoshi.detail.tmall.com' in item_source):
@@ -194,11 +183,11 @@ class Worker():
                 task['urlType'] = 1
 
             mix_time = re.findall('data-targettime="([0-9]{13})"', content)
-            if (re.findall('开抢', data)):
+            if (re.findall('开抢', content)):
                 if(task['status'] == 0):
                     task['status'] += 1
                 task['score'] = int(mix_time[0]) // 1000
-            elif re.findall('还剩', data):
+            elif re.findall('还剩', content):
                 if(task['status'] < 2):
                     task['status'] = 2
                     task['score'] = int(mix_time[0]) // 1000
@@ -206,6 +195,7 @@ class Worker():
             self.save_gecko_page(nfilename, False)
             return True
         except Exception as _Eall:
+            print(traceback.format_exc())
             task['fail'] += 1
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             worklog.error("Time-parsing error: " + str(_Eall) + " on task:" + str(task)) 
@@ -272,11 +262,12 @@ class Worker():
                 else:
                     reqseq = 1
                 self.firefox_driver.get(url_arch[reqseq] + task['itemID'])
-                success_cnt += self.item_indicate(self, task, reqseq + 1, datestr)
+                success_cnt += self.item_indicate(task, reqseq + 1, datestr)
                 time.sleep(10)
         except KeyboardInterrupt:
             pass
         except Exception as _Eall:
+            time.sleep(10)
             worklog.critical('Oops! Something went wrong during page requesting.' + str(_Eall) +'\n')
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             task['fail'] += 1
