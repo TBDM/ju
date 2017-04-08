@@ -131,9 +131,9 @@ class workPipeline():
 #----------main function----------
 
 if __name__ == "__main__":
-	if (tbdmConfig.WHO_IAM == ''):
-		# Check for Config
-		print("Tell me who you are in tbdmConfig before starting pipeline.")
+    if (tbdmConfig.WHO_IAM == ''):
+        # Check for Config
+        print("Tell me who you are in tbdmConfig before starting pipeline.")
     else:
 		workpipe = workPipeline()
 		while (not os.path.exists('stopPipe')):
