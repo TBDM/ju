@@ -202,16 +202,14 @@ class Worker():
                 if(task['status'] < 2):
                     task['status'] = 2
                     task['score'] = int(mix_time[0]) // 1000
-            nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' 
-                        + str(int(time.time()))  + '.html'
+            nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename, False)
             return True
         except Exception as _Eall:
             task['fail'] += 1
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             worklog.error("Time-parsing error: " + str(_Eall) + " on task:" + str(task)) 
-            nfilename = datestr + '/error/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' 
-                        + str(int(time.time()))  + '.html'
+            nfilename = datestr + '/error/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename, False)
             return False
 
