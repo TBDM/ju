@@ -62,6 +62,7 @@ class workPipeline():
 	"""
 	tasknum = tbdmConfig.TASK_NUM;
 	time_wait_flag = True
+	worker = tbdmscraper.Worker()
 
 	def tasker(self):
 		if os.path.exists("tbdmPipelock.lock"):
@@ -87,7 +88,7 @@ class workPipeline():
 							continue
 							#Redis returned no task
 						poppipe.execute()
-						tbdmscraper.task_locker(tasklist)
+						self.worker.task_locker(tasklist)
 						break
 					except redis.exceptions.WatchError as _Ewatch:
 						logger.warning("Redis watch error, retry fetching.")
@@ -104,19 +105,19 @@ class workPipeline():
 				tasknum		Tasks to be executed at one run, no more than 100.
 		"""
 		taskstrs = self.tasker()
-		taskdicts = tbdmscraper.task_strs2dicts(taskstrs)
-		if(tbdmscraper.task_min_score(taskdicts) > time.time()):
-			sleeptime = int((tbdmscraper.task_min_score(taskdicts) - time.time()) % 420) + 30
+		taskdicts = self.worker.task_strs2dicts(taskstrs)
+		if(self.worker.task_min_score(taskdicts) > time.time()):
+			sleeptime = int((self.worker.task_min_score(taskdicts) - time.time()) % 420) + 30
 			if(self.time_wait_flag):
 				logger.warning("Worker halts waiting for latest tasktime for " + str(sleeptime) + " seconds.")
 				self.time_wait_flag = False
-			tbdmscraper.task_back2redis(taskdicts)
+			self.worker.task_back2redis(taskdicts)
 			time.sleep(sleeptime)
 		else:
 			if(not self.time_wait_flag):
 				logger.warning("Worker continued from task time waiting.")
 				self.time_wait_flag = True
-			(success_cnt, total_cnt) = tbdmscraper.request_page(taskdicts)
+			(success_cnt, total_cnt) = self.worker.request_page(taskdicts)
 			logger.warning("Worker finished " + str(success_cnt) + " out of " + str(total_cnt))
 
 #----------class definition----------
@@ -130,28 +131,21 @@ class workPipeline():
 #----------main function----------
 
 if __name__ == "__main__":
-	workpipe = workPipeline()
-	# try:
-	# 	# tbdmscraper.display.start()
-	# except Exception as _Eall:
-	# 	logger.critical("Manager reported an error " + str(_Eall))
-	# 	time.sleep(3)
-
-	while (not os.path.exists('stopPipe')):
-		try:
-			workpipe.manager()
-		except Exception as _Eall:
-			logger.critical("Manager reported an error " + str(_Eall))
-			time.sleep(3)
-			tbdmscraper.firefox_driver.quit()
-			# tbdmscraper.phantomjs_driver.quit()
-			# tbdmscraper.display.stop() 
-		else:
-			logger.info("Manager finished one round.")
-	tbdmscraper.firefox_driver.quit()
-	# tbdmscraper.phantomjs_driver.quit()
-	# tbdmscraper.display.stop() 
-	logger.warning("Manager stopped on detecting flag.")
-	slacker.post_message("Manager stopped on detecting flag.")
+	if (tbdmConfig.WHO_IAM == ''):
+		# Check for Config
+		print("Tell me who you are in tbdmConfig before starting pipeline.")
+    else:
+		workpipe = workPipeline()
+		while (not os.path.exists('stopPipe')):
+			try:
+				workpipe.manager()
+			except Exception as _Eall:
+				logger.critical("Manager reported an error " + str(_Eall))
+				time.sleep(3)
+			else:
+				logger.info("Manager finished one round.")
+		tbdmscraper.display.close()
+		logger.warning("Manager stopped on detecting flag.")
+		slacker.post_message("Manager stopped on detecting flag.")
 
 #----------main function----------
