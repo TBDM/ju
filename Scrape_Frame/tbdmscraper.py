@@ -78,7 +78,10 @@ class Worker():
                 pickle.dump(tasks, f, 0)
 
     def task_back2redis(self, taskdicts):
-        tasks = task_dicts2strs(taskdicts)
+        for task in taskdicts:
+            if (task['status'] > 1 and task['score'] == 0):
+                task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+        tasks = self.task_dicts2strs(taskdicts)
         with self.redisCli.pipeline() as redisp:
             for task in tasks:
                 redisp.zadd('juList', int(task.split('/')[2]), task)
@@ -172,7 +175,7 @@ class Worker():
     def juDetail_indicate(self, task, datestr):
         try:
             content = self.firefox_driver.page_source
-            item_source = re.findall('<a href="//(.*)tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
+            item_source = re.findall('<a target="_blank" href="//(.*)tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
             if ('tmall.hk' in item_source):
                 task['urlType'] = 2
             elif ('chaoshi.detail.tmall.com' in item_source):

@@ -118,6 +118,7 @@ class workPipeline():
                 logger.warning("Worker continued from task time waiting.")
                 self.time_wait_flag = True
             (success_cnt, total_cnt) = self.worker.request_page(taskdicts)
+            os.remove('tbdmPipelock.lock')
             logger.warning("Worker finished " + str(success_cnt) + " out of " + str(total_cnt))
 
 #----------class definition----------
@@ -139,6 +140,11 @@ if __name__ == "__main__":
         while (not os.path.exists('stopPipe')):
             try:
                 workpipe.manager()
+            except KeyboardInterrupt:
+                logger.critical("KeyboardInterrupt work. ")
+                tbdmscraper.display.close()
+                logger.warning("Manager stopped on detecting flag.")
+                break
             except Exception as _Eall:
                 logger.critical("Manager reported an error " + str(_Eall))
                 time.sleep(3)
