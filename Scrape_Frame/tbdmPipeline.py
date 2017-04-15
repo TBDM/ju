@@ -71,12 +71,12 @@ class workPipeline():
                 tasklist = pickle.load(f)
         else:
             with redisCli.pipeline() as poppipe:
-                while True:
+                while (True):
                     try:
                         #Starting transaction
                         poppipe.watch('juList')
                         tasklist = poppipe.zrange('juList', 0, self.tasknum - 1)
-                        if tasklist:
+                        if (tasklist):
                             poppipe.multi()
                             for item in tasklist:
                                 poppipe.zrem('juList', item)
@@ -118,7 +118,7 @@ class workPipeline():
                 logger.warning("Worker continued from task time waiting.")
                 self.time_wait_flag = True
             (success_cnt, total_cnt) = self.worker.request_page(taskdicts)
-            os.remove('tbdmPipelock.lock')
+            # os.remove('tbdmPipelock.lock')
             logger.warning("Worker finished " + str(success_cnt) + " out of " + str(total_cnt))
 
 #----------class definition----------
@@ -147,7 +147,7 @@ if __name__ == "__main__":
                 break
             except Exception as _Eall:
                 logger.critical("Manager reported an error " + str(_Eall))
-                time.sleep(3)
+                time.sleep(tbConfig.SLEEP_TIME)
             else:
                 logger.info("Manager finished one round.")
         tbdmscraper.display.close()

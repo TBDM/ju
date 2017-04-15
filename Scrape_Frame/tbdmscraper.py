@@ -20,6 +20,7 @@ from selenium import webdriver
 from pyvirtualdisplay import Display
 
 # Import custom models
+import tbdmConfig
 import tbdmFilter
 from tbdmSetting import tbdmDatabase
 from tbdmLogging import tbdmLogger
@@ -79,7 +80,7 @@ class Worker():
 
     def task_back2redis(self, taskdicts):
         for task in taskdicts:
-            if (task['status'] > 1 and task['score'] == 0):
+            if (task['status'] > 0 and task['score'] == 0):
                 task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
         tasks = self.task_dicts2strs(taskdicts)
         with self.redisCli.pipeline() as redisp:
@@ -147,22 +148,25 @@ class Worker():
         @author: P.Liu X.Huang L.Xuezhang
         """
         try:
-            content = self.firefox_driver.page_source        
-            if (task['status'] > 1):
-                task['status'] += 1
-                task['score'] += 86400 # Scrape on next day                
-            elif (("login" in self.firefox_driver.current_url) or 
+            content = self.firefox_driver.page_source
+            if (("login" in self.firefox_driver.current_url) or 
                 ("anti" in self.firefox_driver.current_url)):
                     # Failure situation
                     task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
                     task['fail'] += 1
                     worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
-                    return 0
+                    return 0        
+            if (task['status'] > 2):
+                task['status'] += 1
+                if (task['score'] > 0):
+                    task['score'] += 86400 # Scrape on next day
+                else:
+                    task['score'] = int(time.time()) + 86400
             nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
             self.save_gecko_page(nfilename)
             with open(datestr + '/success.log','a', encoding = "utf-8") as f:
-                f.write(task['itemID'] + ',' + str(url) + ',' + str(task['score']) + "\n")
+                f.write(task['itemID'] + ',' + str(task['status']) + ',' + str(url) + ',' + str(task['score']) + "\n")
             return 1
         except Exception:
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
@@ -188,12 +192,15 @@ class Worker():
             mix_time = re.findall('data-targettime="([0-9]{13})"', content)
             if (re.findall('开抢', content)):
                 if(task['status'] == 0):
-                    task['status'] += 1
+                    task['status'] = 1
                 task['score'] = int(mix_time[0]) // 1000
             elif re.findall('还剩', content):
-                if(task['status'] < 2):
+                if(task['status'] == 1):
                     task['status'] = 2
                     task['score'] = int(mix_time[0]) // 1000
+            elif re.findall('已结束', content):
+                if (task['status'] < 3):
+                    task['status'] = 3
             nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename, False)
             return True
@@ -243,34 +250,30 @@ class Worker():
                     with open(datestr + "/abandoned_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
-                    break
+                    continue;
                 if (task['status'] > 14):
                     worklog.info("Track of " + str(task) + " finished. Hooray!")
                     slacker.post_message("Track of " + str(task) + " finished. Hooray!", channel = "worker")
                     with open(datestr +"/finished_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
-                    break
+                    continue
                 if (task['urlType'] > 0 and task['urlType'] < 5):
                     reqseq = task['urlType']
                 else:
                     reqseq = 1
                 if (task['status'] < 2):
                     if (not self.juDetail_request(url_arch[0] + task['juID'] + "&item_id=" + task['itemID'], task, datestr)):
-                        time.sleep(10)
+                        time.sleep(tbdmConfig.SLEEP_TIME)
                         continue
-                    time.sleep(10)
-                if(task['urlType'] > 0 and task['urlType'] < 5):
-                    reqseq = task['urlType']
-                else:
-                    reqseq = 1
+                    time.sleep(tbdmConfig.SLEEP_TIME)
                 self.firefox_driver.get(url_arch[reqseq] + task['itemID'])
                 success_cnt += self.item_indicate(task, reqseq + 1, datestr)
-                time.sleep(10)
+                time.sleep(tbdmConfig.SLEEP_TIME)
         except KeyboardInterrupt:
             pass
         except Exception as _Eall:
-            time.sleep(10)
+            time.sleep(tbdmConfig.SLEEP_TIME)
             worklog.critical('Oops! Something went wrong during page requesting.' + str(_Eall) +'\n')
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             task['fail'] += 1
