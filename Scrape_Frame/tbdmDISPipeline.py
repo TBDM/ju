@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# Pipeline for computers with displays.
 
 #----------model import----------
 
@@ -10,7 +10,7 @@ import pickle
 import random
 import redis.exceptions
 
-import tbdmscraper
+import tbdmDIScraper as tbdmscraper
 import tbdmConfig
 from tbdmSetting import tbdmDatabase
 from tbdmLogging import tbdmLogger
@@ -149,7 +149,6 @@ if __name__ == "__main__":
                 time.sleep(tbdmConfig.SLEEP_TIME)
             else:
                 logger.info("Manager finished one round.")
-        tbdmscraper.display.close()
         logger.warning("Manager stopped on detecting flag.")
         slacker.post_message("Manager stopped on detecting flag.")
 
