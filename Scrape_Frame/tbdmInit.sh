@@ -26,7 +26,7 @@ else
 	if [ "$?" = "0" ];then
 		echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $rc
 		echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $rc
-		echo 'eval "$(pyenv init -)"' >> ~$rc
+		echo 'eval "$(pyenv init -)"' >> $rc
 		echo "installed pyenv ok..."
 	else
 		echo "Error when install pyenv."
@@ -38,6 +38,7 @@ else
 		pyenv install 3.6.0
 		if [ "$?" = "0" ];then
 			echo "installed python3 ok..."
+
 		fi
 	else
 		echo "Error when install python3 dependencies..."
