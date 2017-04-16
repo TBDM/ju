@@ -111,7 +111,7 @@ fi
 if [ -x "/usr/bin/geckodriver" ];then
 	echo "geckodriver is already installed"
 else
-	wget http://onns.xyz/temp/geckodriver.tar.gz
+	wget https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz
 	if [ "$?" = "0" ];then
 		tar -xf geckodriver.tar.gz
 		sudo cp geckodriver /usr/bin/
