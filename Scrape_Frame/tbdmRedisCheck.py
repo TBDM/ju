@@ -54,7 +54,7 @@ class redisCheck():
     redisCli = tbdmDb.tbdmRedis(addrOwner = 'xhuang', auth = True)
 
     def reporter(self):
-        result = {0 : 0, 1 : 0, 2 : 0, "today" : 0, "nearnd" : [], "total" : 0}
+        result = {0 : 0, 1 : 0, 2 : 0, "today" : 0, "nearnd" : {}, "total" : 0}
         nowstamp = time.time()
         todayLeft = (datetime.strptime("23:59:59", "%H:%M:%S") - 
                     datetime.strptime(datetime.fromtimestamp(nowstamp).strftime("%H:%M:%S"), "%H:%M:%S")).seconds
@@ -77,11 +77,14 @@ class redisCheck():
                                 if (score <= nowstamp + todayLeft):
                                     result["today"] += 1
                                 else:
-                                    if (len(result["nearnd"]) < 5):
-                                        result["nearnd"].append(score)
+                                    if (score in result["nearnd"].keys()):
+                                            result["nearnd"][score] += 1
                                     else:
-                                        if (score < max(result["nearnd"])):
-                                            result["nearnd"] = result["nearnd"].remove(max(result["nearnd"])).append(score)
+                                        if (len(result["nearnd"]) < 8):
+                                            result["nearnd"][score] = 1
+                                        elif (score < max(result["nearnd"].keys())):
+                                            result["nearnd"].pop()
+                                            result["nearnd"][score] = 1
                                 result["total"] += 1
                     else:
                         print("Redis returned empty list, exiting.")
@@ -100,8 +103,8 @@ class redisCheck():
         print("Tasks within 2 hour:   " + str(result[2]))
         print("Tasks within today:    " + str(result["today"]))
         print("\nEarliest task after today: ") 
-        for i in result["nearnd"]:
-            print(datetime.fromtimestamp(i).strftime("%Y-%m-%d %H:%M:%S"))
+        for k, v in result["nearnd"].items():
+            print(datetime.fromtimestamp(k).strftime("%Y-%m-%d %H:%M:%S") + " : " + str(v))
         print("=====ENDREP=====")
         return
 
