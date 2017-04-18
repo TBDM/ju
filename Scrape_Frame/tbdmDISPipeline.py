@@ -96,6 +96,7 @@ class workPipeline():
                         continue
                     except Exception as _Eall:
                         logger.error(_Eall)
+                        time.sleep(random.unform(30, 60))
         return tasklist
 
     def manager(self):

@@ -91,7 +91,7 @@ class Worker():
             except Exception as _Eall:
                 worklog.error("Feedback to Redis failed." + str(_Eall))
                 slacker.post_message("Feedback to Redis failed, task info dumped to fbRedis.lock .")
-                self.task_locker(taskdicts, "fbRedis.lock")
+                self.task_locker(self.task_dicts2strs(taskdicts), "fbRedis.lock")
                 return None
             else:
                 self.task_locker(None)
