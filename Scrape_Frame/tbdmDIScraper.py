@@ -202,7 +202,7 @@ class Worker():
             if (re.findall('开抢', content)):
                 task['status'] = 1
                 task['score'] = int(mix_time[0]) // 1000
-            elif re.findall('还剩', content):
+            elif re.findall('还剩|马上抢', content):
                 task['status'] = 2
                 task['score'] = int(mix_time[0]) // 1000
             elif (re.findall('已结束', content) or re.findall('卖光', content)):
