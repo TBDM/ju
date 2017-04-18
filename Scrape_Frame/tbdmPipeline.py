@@ -141,14 +141,13 @@ if __name__ == "__main__":
                 workpipe.manager()
             except KeyboardInterrupt:
                 logger.critical("KeyboardInterrupt work. ")
-                tbdmscraper.display.close()
-                logger.warning("Manager stopped on detecting flag.")
                 break
             except Exception as _Eall:
                 logger.critical("Manager reported an error " + str(_Eall))
                 time.sleep(tbdmConfig.SLEEP_TIME)
             else:
                 logger.info("Manager finished one round.")
+        workpipe.firefox_driver.quit()
         tbdmscraper.display.close()
         logger.warning("Manager stopped on detecting flag.")
         slacker.post_message("Manager stopped on detecting flag.")

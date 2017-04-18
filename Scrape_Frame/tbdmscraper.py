@@ -36,7 +36,7 @@ worklog = tbdmLogger("worker", loglevel = 30).log # logging.DEBUG - 10, increase
 slacker = tbdmSlack()
 display = Display(visible=0, size=(1440,900))
 
-
+ANTISPDR_TIME = 150 # Penalty time for being caught by Tmall Anti-spider
 PENALIZE_TIME = 21601 # 6h penalty time and 1s for fail mark
 task_keylist = ["juID", "itemID", "score", "status", "urlType", "fail"]
 url_arch = ["https://detail.ju.taobao.com/home.htm?id=",
@@ -156,7 +156,18 @@ class Worker():
                     task['fail'] += 1
                     worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
-                    return 0        
+                    self.firefox_driver.delete_all_cookies()
+                    time.sleep(tbdmConfig.SLEEP_TIME + ANTISPDR_TIME)
+                    return 0
+            if ('tmall.hk' in self.firefox_driver.current_url):
+                task['urlType'] = 2
+            elif ('chaoshi.detail.tmall.com' in self.firefox_driver.current_url):
+                task['urlType'] = 3
+            elif ('yao.95095.com' in self.firefox_driver.current_url):
+                task['urlType'] = 4
+            else:
+                task['urlType'] = 1 
+
             if (task['status'] > 2):
                 task['status'] += 1
                 if (task['score'] > 0):
@@ -179,25 +190,22 @@ class Worker():
     def juDetail_indicate(self, task, datestr):
         try:
             content = self.firefox_driver.page_source
-            item_source = re.findall('<a target="_blank" href="//(.*)tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
-            if ('tmall.hk' in item_source):
-                task['urlType'] = 2
-            elif ('chaoshi.detail.tmall.com' in item_source):
-                task['urlType'] = 3
-            elif ('yao.95095.com' in item_source):
-                task['urlType'] = 4
-            else:
-                task['urlType'] = 1
-
+            # item_source = re.findall('<a target="_blank" href="//(.*)tracelog=jubuybigpic"', content)[0].replace("&amp;", "&")            
+            # if ('tmall.hk' in item_source):
+            #     task['urlType'] = 2
+            # elif ('chaoshi.detail.tmall.com' in item_source):
+            #     task['urlType'] = 3
+            # elif ('yao.95095.com' in item_source):
+            #     task['urlType'] = 4
+            # else:
+            #     task['urlType'] = 1
             mix_time = re.findall('data-targettime="([0-9]{13})"', content)
             if (re.findall('开抢', content)):
-                if(task['status'] == 0):
-                    task['status'] = 1
+                task['status'] = 1
                 task['score'] = int(mix_time[0]) // 1000
             elif re.findall('还剩', content):
-                if(task['status'] == 1):
-                    task['status'] = 2
-                    task['score'] = int(mix_time[0]) // 1000
+                task['status'] = 2
+                task['score'] = int(mix_time[0]) // 1000
             elif re.findall('已结束', content):
                 if (task['status'] < 3):
                     task['status'] = 3
@@ -251,7 +259,7 @@ class Worker():
                         f.write(str(task))
                     taskdicts.remove(task)
                     continue;
-                if (task['status'] > 14):
+                if (task['status'] > 15):
                     worklog.info("Track of " + str(task) + " finished. Hooray!")
                     slacker.post_message("Track of " + str(task) + " finished. Hooray!", channel = "worker")
                     with open(datestr +"/finished_task.log", "a+", encoding = "utf-8") as f:
@@ -262,7 +270,7 @@ class Worker():
                     reqseq = task['urlType']
                 else:
                     reqseq = 1
-                if (task['status'] < 2):
+                if (task['status'] < 3):
                     if (not self.juDetail_request(url_arch[0] + task['juID'] + "&item_id=" + task['itemID'], task, datestr)):
                         time.sleep(tbdmConfig.SLEEP_TIME)
                         continue
