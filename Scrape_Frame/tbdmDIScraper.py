@@ -205,7 +205,7 @@ class Worker():
             elif re.findall('还剩', content):
                 task['status'] = 2
                 task['score'] = int(mix_time[0]) // 1000
-            elif re.findall('已结束', content):
+            elif (re.findall('已结束', content) or re.findall('卖光', content)):
                 if (task['status'] < 3):
                     task['status'] = 3
             nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'

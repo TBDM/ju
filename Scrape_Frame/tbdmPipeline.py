@@ -147,7 +147,7 @@ if __name__ == "__main__":
                 time.sleep(tbdmConfig.SLEEP_TIME)
             else:
                 logger.info("Manager finished one round.")
-        workpipe.firefox_driver.quit()
+        workpipe.worker.firefox_driver.quit()
         tbdmscraper.display.close()
         logger.warning("Manager stopped on detecting flag.")
         slacker.post_message("Manager stopped on detecting flag.")
