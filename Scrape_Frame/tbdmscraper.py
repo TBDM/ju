@@ -211,6 +211,11 @@ class Worker():
                     task['status'] = 3
             else:
                 worklog.error("juStatus-parsing error: " + str(_Eall) + " on task:" + str(task))
+                print(traceback.format_exc())
+                task['fail'] += 1
+                task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+                nfilename = datestr + '/error/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
+                self.save_gecko_page(nfilename, False)
                 return False
             nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename, False)
