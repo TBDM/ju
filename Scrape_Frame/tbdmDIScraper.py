@@ -237,6 +237,9 @@ class Worker():
                 task['score'] += int(time.time() / 10) * 10 + PENALIZE_TIME
                 worklog.critical("Redirected to login page: " + str(_Eall) + " on task:" + str(task))
                 return False
+            elif(self.firefox_driver.current_url == "https://ju.taobao.com/"):
+                task['fail'] += 9 #ju canceled
+                return False
             else:
                 return self.juDetail_indicate(task, datestr)
         except KeyboardInterrupt:
