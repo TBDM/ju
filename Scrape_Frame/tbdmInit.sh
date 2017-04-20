@@ -31,19 +31,20 @@ else
 	else
 		echo "Error when install pyenv."
 	fi
-
-	source $rc
-	sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev
-	if [ "$?" = "0" ];then
-		pyenv install 3.6.0
-		if [ "$?" = "0" ];then
-			echo "installed python3 ok..."
-
-		fi
-	else
-		echo "Error when install python3 dependencies..."
-	fi
 fi
+
+source $rc
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev
+if [ "$?" = "0" ];then
+	pyenv install 3.6.0
+	if [ "$?" = "0" ];then
+		echo "installed python3 ok..."
+
+	fi
+else
+	echo "Error when install python3 dependencies..."
+fi
+
 
 
 #slacker(0.9.30)
@@ -117,6 +118,6 @@ else
 		sudo cp geckodriver /usr/bin/
 		echo "installed geckodriver ok..."
 	else
-		echo "Error when pip install slacker."
+		echo "Error when install geckodriver."
 	fi
 fi
