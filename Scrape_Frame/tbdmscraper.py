@@ -173,7 +173,7 @@ class Worker():
                 if (task['score'] > 0):
                     task['score'] += 86400 # Scrape on next day
                 else:
-                    task['score'] = int(time.time()) + 86400
+                    task['score'] = int(time.time() / 10) * 10 + 86400
             nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
             self.save_gecko_page(nfilename)
             with open(datestr + '/success.log','a', encoding = "utf-8") as f:
@@ -203,7 +203,7 @@ class Worker():
             if (re.findall('开抢', content)):
                 task['status'] = 1
                 task['score'] = int(mix_time[0]) // 1000
-            elif re.findall('还剩|马上抢', content):
+            elif re.findall('还剩|马上抢|马上订', content):
                 task['status'] = 2
                 task['score'] = int(mix_time[0]) // 1000
             elif (re.findall('已结束', content) or re.findall('卖光', content)):
@@ -211,6 +211,11 @@ class Worker():
                     task['status'] = 3
             else:
                 worklog.error("juStatus-parsing error: " + str(_Eall) + " on task:" + str(task))
+                print(traceback.format_exc())
+                task['fail'] += 1
+                task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+                nfilename = datestr + '/error/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
+                self.save_gecko_page(nfilename, False)
                 return False
             nfilename = datestr + '/success/juDetail-' + task['itemID'] + '-' + task['juID'] + '-' + str(int(time.time()))  + '.html'
             self.save_gecko_page(nfilename, False)
@@ -232,6 +237,9 @@ class Worker():
                 task['fail'] += 1
                 task['score'] += int(time.time() / 10) * 10 + PENALIZE_TIME
                 worklog.critical("Redirected to login page: " + str(_Eall) + " on task:" + str(task))
+                return False
+            elif(self.firefox_driver.current_url == "https://ju.taobao.com/"):
+                task['fail'] += 9 #ju canceled
                 return False
             else:
                 return self.juDetail_indicate(task, datestr)
