@@ -83,7 +83,7 @@ class redisCheck():
                                         if (len(result["nearnd"]) < 12):
                                             result["nearnd"][score] = 1
                                         elif (score < max(result["nearnd"].keys())):
-                                            result["nearnd"].pop()
+                                            result["nearnd"].pop(max(result["nearnd"].keys()))
                                             result["nearnd"][score] = 1
                                 result["total"] += 1
                     else:
