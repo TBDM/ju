@@ -258,6 +258,7 @@ class Worker():
         success_cnt = 0
         total_cnt = len(taskdicts)
         datestr = time.strftime("%Y%m%d", time.localtime())
+        self.firefox_driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
         
         if not os.path.isdir(datestr):
             os.mkdir(datestr)
