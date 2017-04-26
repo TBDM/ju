@@ -245,6 +245,12 @@ class Worker():
                 return False
             else:
                 return self.juDetail_indicate(task, datestr)
+        except selenium.common.exceptions.TimeoutException:
+            task['fail'] +=1
+            task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+            worklog.critical("Request ju " + task['itemID'] + "timeout!")
+            slacker.post_message('Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
+            return False
         except KeyboardInterrupt:
             pass
 
@@ -288,9 +294,16 @@ class Worker():
                         time.sleep(tbdmConfig.SLEEP_TIME)
                         continue
                     time.sleep(tbdmConfig.SLEEP_TIME)
-                self.firefox_driver.get(url_arch[reqseq] + task['itemID'])
-                success_cnt += self.item_indicate(task, reqseq + 1, datestr)
-                time.sleep(tbdmConfig.SLEEP_TIME)
+                try:
+                    self.firefox_driver.get(url_arch[reqseq] + task['itemID'])
+                    time.sleep(tbdmConfig.SLEEP_TIME)
+                    success_cnt += self.item_indicate(task, reqseq + 1, datestr)
+                except selenium.common.exceptions.TimeoutException:
+                    task['fail'] +=1
+                    task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
+                    worklog.critical("Request" + task['itemID'] + "timeout!")
+                    slacker.post_message('Master, I have trouble when requesting a page(Timeout).You may check out your network.')
+                    continue
         except KeyboardInterrupt:
             pass
         except Exception as _Eall:
