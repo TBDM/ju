@@ -36,7 +36,7 @@ slacker = tbdmSlack()
 
 
 ANTISPDR_TIME = 150 # Penalty time for being caught by Tmall Anti-spider
-PENALIZE_TIME = 21601 # 6h penalty time and 1s for fail mark
+PENALIZE_TIME = 10801 # 3h penalty time and 1s for fail mark
 task_keylist = ["juID", "itemID", "score", "status", "urlType", "fail"]
 url_arch = ["https://detail.ju.taobao.com/home.htm?id=",
             "https://item.taobao.com/item.htm?id=",
@@ -288,8 +288,8 @@ class Worker():
                         continue
                     time.sleep(tbdmConfig.SLEEP_TIME)
                 self.firefox_driver.get(url_arch[reqseq] + task['itemID'])
+                time.sleep(tbdmConfig.SLEEP_TIME) # Sleep first to prevent indicating before finishing the web request
                 success_cnt += self.item_indicate(task, reqseq + 1, datestr)
-                time.sleep(tbdmConfig.SLEEP_TIME)
         except KeyboardInterrupt:
             pass
         except Exception as _Eall:
