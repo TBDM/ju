@@ -17,6 +17,7 @@ import subprocess
 # Import third-part models
 import requests
 from selenium import webdriver
+import selenium.common.exceptions
 from pyvirtualdisplay import Display
 
 # Import custom models
@@ -37,7 +38,7 @@ slacker = tbdmSlack()
 display = Display(visible=0, size=(1440,900))
 
 ANTISPDR_TIME = 150 # Penalty time for being caught by Tmall Anti-spider
-PENALIZE_TIME = 21601 # 6h penalty time and 1s for fail mark
+PENALIZE_TIME = 10801 # 3h penalty time and 1s for fail mark
 task_keylist = ["juID", "itemID", "score", "status", "urlType", "fail"]
 url_arch = ["https://detail.ju.taobao.com/home.htm?id=",
             "https://item.taobao.com/item.htm?id=",
@@ -258,7 +259,7 @@ class Worker():
         success_cnt = 0
         total_cnt = len(taskdicts)
         datestr = time.strftime("%Y%m%d", time.localtime())
-        self.firefox_driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+        self.firefox_driver.set_page_load_timeout(tbdmConfig.PAGE_LOAD_TIMEOUT)
         
         if not os.path.isdir(datestr):
             os.mkdir(datestr)
