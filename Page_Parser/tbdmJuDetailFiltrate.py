@@ -205,7 +205,6 @@ def parseJuDetailPage(htmlStr, htmlName):
             juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '0']
         if(juDetailResult['seller_rate'][i][-1:] == '↓'):
             juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '-1']
-        
 
     return juDetailResult
 
@@ -217,11 +216,9 @@ def parseJuDetailPage(htmlStr, htmlName):
 if __name__ == "__main__":
     for date in os.listdir(fileLocation):
         # Filtrate the page day by day.
-        n = 0
         if(os.path.isdir(fileLocation + date) and len(date) == 8 and re.match('^([0-9]{8})$', date)):
             # Only if the path is a direction and the folder name is like YYYYMMDD can it be parsed.
             for juPage in os.listdir(fileLocation + date + '/success/'):
-                n = n + 1
                 juDetailResult = dict()
                 # the dict juDetailResult is used to store the content we parsed temporarily.
                 if(juPage[0:8] == 'juDetail'):
@@ -231,5 +228,3 @@ if __name__ == "__main__":
                     print(parseJuDetailPage(pageStr, juPage))
                 else:
                     continue
-                if(n == 10):
-                    break
