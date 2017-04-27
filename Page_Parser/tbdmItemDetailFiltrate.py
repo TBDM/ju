@@ -44,74 +44,74 @@ fileLocation = '/data/TBDMdocs/'
 juDetailXpath = {
     'title': {
         'option': False, 
-        'xpath': ['//h2[@class="title"]/text()'], 
-        'only': [True]
-    }, 
-    'type': {
-        'option': False, 
-        'xpath': ['//div[@class="header clearfix"]/ul/li/a/text()', '//div[@class="header clearfix"]/a/img/@src'], 
-        'only': [False, True]
-    }, 
-    'head_picture': {
-        'option': False, 
-        'xpath': ['//div[@class="item-pic-wrap"]/img/@src', '//div[@class="J_zoom pic "]/@style', '//div[@class="J_zoom pic"]/@style'], 
+        'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()', '//h3[@class="tb-main-title"]/text()'], 
         'only': [True, True, True]
     }, 
-    'all_picture': {
-        'option': True, 
-        'xpath': ['//ul[@class="thumbnails"]/li/img/@data-big'], 
-        'only': [False]
-    }, 
-    'privilege': {
+    # 'type': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="header clearfix"]/ul/li/a/text()', '//div[@class="header clearfix"]/a/img/@src'], 
+    #     'only': [False, True]
+    # }, 
+    'head_picture': {
         'option': False, 
-        'xpath': ['//div[@class="biztag"]/label/text()', '//div[@class="biztag "]/label/text()'], 
+        'xpath': ['//img[@id="J_ImgBooth"]/@src'], 
+        'only': [True]
+    }, 
+    'all_picture': {
+        'option': False, 
+        'xpath': ['//ul[@id="J_UlThumb"]/li/a/img/@src', '//ul[@id="J_UlThumb"]/li/div/a/img/@src'], 
         'only': [False, False]
     }, 
-    'description': {
-        'option': False, 
-        'xpath': ['//div[@class="description"]/ul/li/text()'], 
-        'only': [False]
-    }, 
-    'start_time': {
-        'option': True, 
-        'xpath': ['//div[@class="ju-clock J_juItemTimer"]/@data-targettime'], 
+    'privilege': {
+        'option': True,
+        'xpath': ['//div[@class="tb-detail-hd"]/p/text()'], 
         'only': [True]
     }, 
-    'ju_price': {
-        'option': False, 
-        'xpath': ['//span[@class="extra currentPrice"]/span[@class="J_actPrice"]/text()'], 
-        'only': [True]
-    }, 
-    'origin_price': {
-        'option': True, 
-        'xpath': ['//del[@class="originPrice"]/text()'], 
-        'only': [True]
-    }, 
-    'sale': {
-        'option': True, 
-        'xpath': ['//span[@class="soldnum"]/em/text()'], 
-        'only': [True]
-    }, 
-    'seller_name': {
-        'option': False, 
-        'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/text()'], 
-        'only': [True]
-    }, 
-    'seller_url': {
-        'option': False, 
-        'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/@href'], 
-        'only': [True]
-    }, 
-    'seller_rate': {
-        'option': False, 
-        'xpath': ['//div[@class="con"]/table/tbody/tr[2]/td/text()'], 
-        'only': [False]
-    }, 
-    'seller_promise': {
-        'option': False, 
-        'xpath': ['//div[@class="con"]/ul[@class="clearfix J_PromiseCon"]/li/a/span/text()'], 
-        'only': [False]
-    }
+    # 'description': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="description"]/ul/li/text()'], 
+    #     'only': [False]
+    # }, 
+    # 'start_time': {
+    #     'option': True, 
+    #     'xpath': ['//div[@class="ju-clock J_juItemTimer"]/@data-targettime'], 
+    #     'only': [True]
+    # }, 
+    # 'ju_price': {
+    #     'option': False, 
+    #     'xpath': ['//span[@class="extra currentPrice"]/span[@class="J_actPrice"]/text()'], 
+    #     'only': [True]
+    # }, 
+    # 'origin_price': {
+    #     'option': True, 
+    #     'xpath': ['//del[@class="originPrice"]/text()'], 
+    #     'only': [True]
+    # }, 
+    # 'sale': {
+    #     'option': True, 
+    #     'xpath': ['//span[@class="soldnum"]/em/text()'], 
+    #     'only': [True]
+    # }, 
+    # 'seller_name': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/text()'], 
+    #     'only': [True]
+    # }, 
+    # 'seller_url': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/@href'], 
+    #     'only': [True]
+    # }, 
+    # 'seller_rate': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="con"]/table/tbody/tr[2]/td/text()'], 
+    #     'only': [False]
+    # }, 
+    # 'seller_promise': {
+    #     'option': False, 
+    #     'xpath': ['//div[@class="con"]/ul[@class="clearfix J_PromiseCon"]/li/a/span/text()'], 
+    #     'only': [False]
+    # }
 }
 
 #----------global variables----------
@@ -119,6 +119,11 @@ juDetailXpath = {
 
 #----------function definition----------
 
+def itemType(htmlStr):
+    if(re.search('淘宝网</title>', htmlStr)):
+        return 1
+    else:
+        return 2
 def parseJuDetailPage(htmlStr, htmlName):
     treeObj = etree.HTML(htmlStr)
     # Here we get a HTML tree so that we can use xpath to find the element we need.
@@ -144,6 +149,7 @@ def parseJuDetailPage(htmlStr, htmlName):
         if(not(info in juDetailResult) and not(juDetailXpath[info]['option'])):
             # The information we need but can not be found in juDetailResult
             # So there must be some errors.
+
             if(info == 'ju_price'):
                 # when the price is not an integer xpath can not match the right price
                 # so we need to use regular expression to get the price.
@@ -168,9 +174,10 @@ def parseJuDetailPage(htmlStr, htmlName):
             print('\033[1;31mMatch Error\033[0m')
             return -1
     # Do not forget to set ju_id and item_id that are stored in the filename.
-    juDetailResult['ju_id'] = htmlName.split('-')[1]
-    juDetailResult['item_id'] = htmlName.split('-')[2]
+    juDetailResult['item_id'] = htmlName.split('-')[0]
     
+    
+    juDetailResult['item_type'] = itemType(htmlStr)
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
     
@@ -178,34 +185,34 @@ def parseJuDetailPage(htmlStr, htmlName):
     # To:       title
     juDetailResult['title'] = juDetailResult['title'].strip()
 
-    # From:     background-image: url(head_picture_url);
-    # To:       head_picture_url
-    if(juDetailResult['head_picture'][0:16] == 'background-image'):
-        juDetailResult['head_picture'] = juDetailResult['head_picture'][22:-2]
+    # # From:     background-image: url(head_picture_url);
+    # # To:       head_picture_url
+    # if(juDetailResult['head_picture'][0:16] == 'background-image'):
+    #     juDetailResult['head_picture'] = juDetailResult['head_picture'][22:-2]
 
-    # From:     ms
-    # To:       s
-    if('start_time' in juDetailResult):
-        juDetailResult['start_time'] = juDetailResult['start_time'][0:10]
+    # # From:     ms
+    # # To:       s
+    # if('start_time' in juDetailResult):
+    #     juDetailResult['start_time'] = juDetailResult['start_time'][0:10]
 
-    # From:     \n ju_price \n
-    # To:       ju_price
-    juDetailResult['ju_price'] = juDetailResult['ju_price'].strip()
+    # # From:     \n ju_price \n
+    # # To:       ju_price
+    # juDetailResult['ju_price'] = juDetailResult['ju_price'].strip()
     
-    # From:     ¥origin_price
-    # To:       origin_price
-    if('origin_price' in juDetailResult):
-        juDetailResult['origin_price'] = juDetailResult['origin_price'][1:]
+    # # From:     ¥origin_price
+    # # To:       origin_price
+    # if('origin_price' in juDetailResult):
+    #     juDetailResult['origin_price'] = juDetailResult['origin_price'][1:]
 
-    # From:     ['rate ↑', 'rate -', 'rate ↓']
-    # To:       [['rate', '1'], ['rate', '0'], ['rate','-1']
-    for i in range(3):
-        if(juDetailResult['seller_rate'][i][-1:] == '↑'):
-            juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '1']
-        if(juDetailResult['seller_rate'][i][-1:] == '-'):
-            juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '0']
-        if(juDetailResult['seller_rate'][i][-1:] == '↓'):
-            juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '-1']
+    # # From:     ['rate ↑', 'rate -', 'rate ↓']
+    # # To:       [['rate', '1'], ['rate', '0'], ['rate','-1']
+    # for i in range(3):
+    #     if(juDetailResult['seller_rate'][i][-1:] == '↑'):
+    #         juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '1']
+    #     if(juDetailResult['seller_rate'][i][-1:] == '-'):
+    #         juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '0']
+    #     if(juDetailResult['seller_rate'][i][-1:] == '↓'):
+    #         juDetailResult['seller_rate'][i] = [juDetailResult['seller_rate'][i][0:-2], '-1']
 
     return juDetailResult
 
@@ -222,8 +229,8 @@ if __name__ == "__main__":
             for juPage in os.listdir(fileLocation + date + '/success/'):
                 juDetailResult = dict()
                 # the dict juDetailResult is used to store the content we parsed temporarily.
-                if(juPage[0:8] == 'juDetail'):
-                    # Ju detail page will be named like juDetail-JuID-ItemID-Timestrap.html
+                if(len(juPage.split('-'))== 3 and juPage.split('-')[2] == 'filtered.html'):
+                    # Item detail page will be named like ItemID-Timestrap-filtered.html
                     pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
                     pageStr = pageObj.read()
                     print(parseJuDetailPage(pageStr, juPage))
