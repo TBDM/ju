@@ -160,7 +160,7 @@ class Worker():
                     self.firefox_driver.delete_all_cookies()
                     time.sleep(tbdmConfig.SLEEP_TIME + ANTISPDR_TIME)
                     return 0
-            elif (re.findall("很抱歉，您查看的宝贝不存在，可能已下架或者被转移", content)):
+            elif (re.findall("很抱歉，您查看的宝贝不存在，可能已下架或者被转移", content) or re.findall("很抱歉，您查看的商品找不到了",content)):
                 task['fail'] += 9
                 return 0
             if ('tmall.hk' in self.firefox_driver.current_url):
