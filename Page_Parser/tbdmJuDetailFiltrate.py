@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Filtrate data from Ju detail pages.
 
@@ -39,7 +40,7 @@ import re
 
 #----------global variables----------
 
-fileLocation = '/root/tbdm/file/'
+fileLocation = '/data/TBDMdocs/'
 juDetailXpath = {
     'title': {
         'option': False, 
