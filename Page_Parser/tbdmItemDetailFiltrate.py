@@ -88,11 +88,52 @@ juDetailXpath = {
             'xpath': ['//ul[@id="J_UlThumb"]/li/a/img/@src'], 
             'only': [False]
         }, 
+        'collect_number': {
+            'option': False, 
+            'xpath': ['//span[@id="J_CollectCount"]/text()'], 
+            'only': [False]
+        }, 
         'privilege': {
             'option': True,
             'xpath': ['//div[@class="tb-detail-hd"]/p/text()'], 
             'only': [True]
+        },
+        'origin_price': {
+            'option': True, 
+            'xpath': ['//dl[@id="J_StrPriceModBox"]/dd/span[@class="tm-price"]/text()', '//dl[@class="tm-tagPrice-panel"]/dd/span[@class="tm-price"]/text()'],
+            'only': [True, True]
+        }, 
+        'tmall_price' : {
+            'option': True, 
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/span[@class="tm-price"]/text()'],
+            'only': [True]
+        },
+        'tmall_price_reason' : {
+            'option': True, 
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/em[2]/text()', '//dl[@id="J_PromoPrice"]/dd/div/img/@src'],
+            'only': [True, True]
+        },
+        'tmall_price_promotion' : {
+            'option': True, 
+            'xpath': ['//dl[@class="tm-shopPromo-panel"]/div/dd/text()'],
+            'only': [True]
+        },
+        'sale_number' : {
+            'option': False, 
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[1]/div/span[@class="tm-count"]/text()'],
+            'only': [True]
+        },
+        'review_number' : {
+            'option': False, 
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[2]/div/span[@class="tm-count"]/text()'],
+            'only': [True]
+        },
+        'tmall_point' : {
+            'option': False, 
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[3]/div/a/span[@class="tm-count"]/text()'],
+            'only': [True]
         }
+
     },
     '3': {
         'title': {
@@ -253,6 +294,17 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             juDetailResult['seller_rate'] = temp
         del(temp)
         del(juDetailResult['seller_rate_str'])
+        juDetailResult['seller_name'] = tempTree.xpath('//div[@class="extend"]/ul/li[1]/div/a/text()')
+        juDetailResult['seller_age'] = tempTree.xpath('//div[@class="extend"]/ul/li[3]/div/span[@class="tm-shop-age-num"]/text()')
+        juDetailResult['seller_location'] = tempTree.xpath('//div[@class="extend"]/ul/li[4]/div/text()')
+        juDetailResult['seller_url'] = tempTree.xpath('//div[@class="other"]/a[@class="enter-shop"]/@href')
+        if(not('origin_price' in juDetailResult) and not('tmall_price' in juDetailResult)):
+            print(htmlName)
+            print(juDetailResult)
+            print(htmlType)
+            print('\033[1;31mMatch Error\033[0m')
+            return -2
+
 
     # # From:     background-image: url(head_picture_url);
     # # To:       head_picture_url
