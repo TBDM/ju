@@ -156,6 +156,7 @@ class Worker():
                     task['fail'] += 1
                     worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
+                    slacker.post_message('Oops! Pan said that I must tell you I have requseted a login page!')
                     self.firefox_driver.delete_all_cookies()
                     time.sleep(tbdmConfig.SLEEP_TIME + ANTISPDR_TIME)
                     return 0
