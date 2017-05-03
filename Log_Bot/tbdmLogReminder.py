@@ -4,6 +4,7 @@ import socket
 import os
 import threading
 import pickle
+from tbdmLogging import tbdmLogger
 
 import itchat
 from itchat.content import *
@@ -31,6 +32,7 @@ def text_reply(msg):
 				with open('TBDMUIN', 'wb') as f:
 					pickle.dump(uin, f, 0)
 	else:
+		# uin = msg['FromUserName']
 		itchat.send('Really?')
 
 	print(uin)
@@ -49,13 +51,15 @@ def send_log(msg):
 def listen_log():
 	try:
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		# sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		sock.bind(('', port))
 		print('listening')
 		while(True):
 			data,addr = sock.recvfrom(1024)
-			print(data.decode())
+			sock.sendto(b'OK',addr)
 			send_log(data.decode())
 	except Exception as _Eall:
+		sock.close()
 		logbot.error(str(_Eall))
 
 if __name__ == '__main__':
