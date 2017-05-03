@@ -346,6 +346,9 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
         # To:       collect_number
         juDetailResult['collect_number'] = juDetailResult['collect_number'][1:-3]
 
+        if('attribute' in juDetailResult):
+            juDetailResult['attribute'] = '-QAQ-'.join(juDetailResult['attribute']).replace('\xa0', ' ').split('-QAQ-')
+
 
 
         if(not('origin_price' in juDetailResult) and not('tmall_price' in juDetailResult)):
