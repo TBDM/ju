@@ -1,8 +1,9 @@
-# !/bin/env python
+# !/bin/python
 # coding:utf-8
 import socket
 import os
 import threading
+import pickle
 
 import itchat
 from itchat.content import *
@@ -27,6 +28,10 @@ def text_reply(msg):
 			else:
 				uin = msg['FromUserName']
 				itchat.send(u'UIN got! Thanks!', msg['FromUserName'])
+				with open('TBDMUIN', 'wb') as f:
+					pickle.dump(uin, f, 0)
+	else:
+		itchat.send('Really?')
 
 	print(uin)
 
@@ -42,22 +47,29 @@ def send_log(msg):
 # 	chatroom = itchat.update_chatroom(chatroom[0])
 # itchat.send('hello', toGroupName='TBDM')
 def listen_log():
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sock.bind(('', port))
-	print('listening')
-	while(True):
-		data,addr = sock.recvfrom(1024)
-		print(data.decode())
-		send_log(data.decode())
+	try:
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.bind(('', port))
+		print('listening')
+		while(True):
+			data,addr = sock.recvfrom(1024)
+			print(data.decode())
+			send_log(data.decode())
+	except Exception as _Eall:
+		logbot.error(str(_Eall))
 
 if __name__ == '__main__':
+	logbot = tbdmLogger("logbot", loglevel = 30).log
 	itchat.auto_login(enableCmdQR=2, hotReload=True)
 	threads = []
+	if os.path.exists("TBDMUIN"):
+		with open('TBDMUIN', 'rb') as f:
+			uin = pickle.load(f)
 	try:
 		t_itchat = threading.Thread(target=itchat.run,name = 'itchat')
 		t_itchat.setDaemon(True)
 		t_itchat.start()
 		listen_log()
 	except Exception as _Eall:
-		pass
+		logbot.error(str(_Eall))
 		###
