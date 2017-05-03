@@ -26,6 +26,7 @@ import tbdmFilter
 from tbdmSetting import tbdmDatabase
 from tbdmLogging import tbdmLogger
 from tbdmSlack import tbdmSlack
+import tbdmLogPoster
 
 #----------model import----------
 
@@ -158,6 +159,7 @@ class Worker():
                     worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
                     slacker.post_message('Oops! Pan said that I must tell you I have requseted a login page!')
+                    tbdmLogPoster.post_log(tbdmConfig.WHOAMI, 'Oops! Pan said that I must tell you I have requseted a login page!')
                     self.firefox_driver.delete_all_cookies()
                     time.sleep(tbdmConfig.SLEEP_TIME + ANTISPDR_TIME)
                     return 0
