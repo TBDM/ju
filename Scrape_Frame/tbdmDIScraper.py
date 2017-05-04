@@ -92,6 +92,7 @@ class Worker():
             except Exception as _Eall:
                 worklog.error("Feedback to Redis failed." + str(_Eall))
                 slacker.post_message("Feedback to Redis failed, task info dumped to fbRedis.lock .")
+                tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Feedback to Redis failed, task info dumped to fbRedis.lock .")
                 self.task_locker(self.task_dicts2strs(taskdicts), "fbRedis.lock")
                 return None
             else:
@@ -158,7 +159,7 @@ class Worker():
                     worklog.error('Redirected to login page: ' + task['itemID'] + ','+task['juID'] + ',' + str(url) + ',' + 
                                     str(task['score']) + "\n")
                     slacker.post_message('Oops! Pan said that I must tell you I have requseted a login page!')
-                    tbdmLogPoster.post_log(tbdmConfig.WHOAMI, 'Oops! Pan said that I must tell you I have requseted a login page!')
+                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + 'Oops! Pan said that I must tell you I have requseted a login page!')
                     self.firefox_driver.delete_all_cookies()
                     time.sleep(tbdmConfig.SLEEP_TIME + ANTISPDR_TIME)
                     return 0
@@ -256,6 +257,7 @@ class Worker():
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             worklog.critical("Request ju " + task['itemID'] + "timeout!")
             slacker.post_message('Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
+            tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + 'Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
             return False
         except KeyboardInterrupt:
             pass
@@ -281,6 +283,7 @@ class Worker():
                 if (task['fail'] > 8):
                     worklog.error("Too many failures, abandon task: " + str(task))
                     slacker.post_message("Task " + str(task) + " was abandoned for failures.", channel = "worker")
+                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Task " + str(task) + " was abandoned for failures.", channel = "worker")
                     with open(datestr + "/abandoned_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
@@ -288,6 +291,7 @@ class Worker():
                 if (task['status'] > 15):
                     worklog.info("Track of " + str(task) + " finished. Hooray!")
                     slacker.post_message("Track of " + str(task) + " finished. Hooray!", channel = "worker")
+                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Track of " + str(task) + " finished. Hooray!", channel = "worker")
                     with open(datestr +"/finished_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
@@ -310,6 +314,7 @@ class Worker():
                     task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
                     worklog.critical("Request" + task['itemID'] + "timeout!")
                     slacker.post_message('Master, I have trouble when requesting a page(Timeout).You may check out your network.')
+                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + 'Master, I have trouble when requesting a page(Timeout).You may check out your network.')
                     continue
         except KeyboardInterrupt:
             pass
