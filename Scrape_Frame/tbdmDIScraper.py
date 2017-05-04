@@ -92,7 +92,6 @@ class Worker():
             except Exception as _Eall:
                 worklog.error("Feedback to Redis failed." + str(_Eall))
                 slacker.post_message("Feedback to Redis failed, task info dumped to fbRedis.lock .")
-                tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Feedback to Redis failed, task info dumped to fbRedis.lock .")
                 self.task_locker(self.task_dicts2strs(taskdicts), "fbRedis.lock")
                 return None
             else:
@@ -283,7 +282,6 @@ class Worker():
                 if (task['fail'] > 8):
                     worklog.error("Too many failures, abandon task: " + str(task))
                     slacker.post_message("Task " + str(task) + " was abandoned for failures.", channel = "worker")
-                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Task " + str(task) + " was abandoned for failures.", channel = "worker")
                     with open(datestr + "/abandoned_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
@@ -291,7 +289,6 @@ class Worker():
                 if (task['status'] > 15):
                     worklog.info("Track of " + str(task) + " finished. Hooray!")
                     slacker.post_message("Track of " + str(task) + " finished. Hooray!", channel = "worker")
-                    tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + "Track of " + str(task) + " finished. Hooray!", channel = "worker")
                     with open(datestr +"/finished_task.log", "a+", encoding = "utf-8") as f:
                         f.write(str(task))
                     taskdicts.remove(task)
