@@ -256,7 +256,7 @@ class Worker():
             task['score'] = int(time.time() / 10) * 10 + PENALIZE_TIME
             worklog.critical("Request ju " + task['itemID'] + "timeout!")
             slacker.post_message('Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
-            tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + 'Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
+            #tbdmLogPoster.post_log('notification', tbdmConfig.WHO_IAM + 'Master, I have trouble when requesting a page(Timeout).You may check out your network:)')
             return False
         except KeyboardInterrupt:
             pass
