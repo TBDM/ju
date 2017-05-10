@@ -282,6 +282,7 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             return -1
     # Do not forget to set ju_id and item_id that are stored in the filename.
     juDetailResult['item_id'] = htmlName.split('-')[0]
+    juDetailResult['timestamp'] = htmlName.split('-')[1]
     juDetailResult['item_type'] = itemType(htmlStr)
 
     # Here we have parsed all the useful data
