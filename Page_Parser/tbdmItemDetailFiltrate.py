@@ -219,6 +219,8 @@ juDetailXpath = {
 def itemType(htmlStr):
     if(re.search('title="淘宝网"', htmlStr) or re.search('淘宝网</title>', htmlStr)):
         return '1'
+    if(re.search('href="//meilihui.tmall.com/"', htmlStr)):
+        return '9'
     if(re.search('title="天猫Tmall.com"', htmlStr)):
         return '2'
     if(re.search('title="天猫超市-chaoshi.tmall.com"', htmlStr) or re.search('<title>【天猫超市】', htmlStr)):
@@ -233,7 +235,7 @@ def itemType(htmlStr):
         return '7'
     if(re.search('title="95095医药馆"', htmlStr) or re.search('//img.alicdn.com/tps/i3/T1Jaa0FQ4bXXcMw42c-148-34.png', htmlStr)):
         return '8'
-    return '9'
+    return '10'
 
 def parseItemDetailPage(htmlStr, htmlName, htmlType):
     treeObj = etree.HTML(htmlStr)
