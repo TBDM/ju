@@ -275,12 +275,13 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
 
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
-    
-    # From:     \n title \n
-    # To:       title
-    juDetailResult['title'] = juDetailResult['title'].strip()
 
     if(htmlType == '2'):
+        # From:     \n title \n
+        # To:       title
+        if('title' in juDetailResult):
+            juDetailResult['title'] = juDetailResult['title'].strip()
+        
         if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
             if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
                 juDetailResult['error'].append('此商品已下架')
