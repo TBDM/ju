@@ -262,10 +262,8 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
         if(not(info in juDetailResult) and not(juDetailXpath[htmlType][info]['option'])):
             # The information we need but can not be found in juDetailResult
             # So there must be some errors.
-            if(htmlType == '2'):
-                if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
-                    if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
-                        juDetailResult['error'].append('此商品已下架')
+
+               
             
             # add the information for debuging.
             juDetailResult['error'].append(info)
@@ -283,6 +281,10 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
     juDetailResult['title'] = juDetailResult['title'].strip()
 
     if(htmlType == '2'):
+        if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
+            if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
+                juDetailResult['error'].append('此商品已下架')
+        
         if('seller_rate_str' in juDetailResult):
             tempTree = etree.HTML(juDetailResult['seller_rate_str'].replace('em', 'em '))
             temp = [['','',''],['','',''],['','','']]
