@@ -240,7 +240,7 @@ def itemType(htmlStr):
 def parseItemDetailPage(htmlStr, htmlName, htmlType):
     treeObj = etree.HTML(htmlStr)
     # Here we get a HTML tree so that we can use xpath to find the element we need.
-
+    juDetailResult['error'] = list()
     for info in juDetailXpath[htmlType]:
         # Find the information we need via the dict we declared.
         isMatched = False
@@ -262,24 +262,15 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
         if(not(info in juDetailResult) and not(juDetailXpath[htmlType][info]['option'])):
             # The information we need but can not be found in juDetailResult
             # So there must be some errors.
-
             if(htmlType == '2'):
                 if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
                     if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
-                        print(htmlName)
-                        print(info)
-                        print(juDetailResult)
-                        print(htmlType)
-                        return -3
-
-            # print the information for debuging.
-            print(htmlName)
-            print(info)
-            print(resultList)
-            print(juDetailResult)
-            print(htmlType)
-            print('\033[1;31mMatch Error\033[0m')
-            return -1
+                        juDetailResult['error'].append('此商品已下架')
+                        return juDetailResult
+            
+            # add the information for debuging.
+            juDetailResult['error'].append(info)
+            
     # Do not forget to set ju_id and item_id that are stored in the filename.
     juDetailResult['item_id'] = htmlName.split('-')[0]
     juDetailResult['timestamp'] = htmlName.split('-')[1]
@@ -355,11 +346,7 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
 
 
         if(not('origin_price' in juDetailResult) and not('tmall_price' in juDetailResult)):
-            print(htmlName)
-            print(juDetailResult)
-            print(htmlType)
-            print('\033[1;31mMatch Error\033[0m')
-            return -2
+            juDetailResult['error'].append('no price')
 
 
     # # From:     background-image: url(head_picture_url);
