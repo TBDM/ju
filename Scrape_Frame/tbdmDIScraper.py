@@ -175,10 +175,7 @@ class Worker():
                 task['urlType'] = 1 
             if (task['status'] > 2):
                 task['status'] += 1
-                if (task['score'] > 0):
-                    task['score'] += 86400 # Scrape on next day
-                else:
-                    task['score'] = int(time.time() / 10) * 10 + 86400
+                task['score'] = int(time.time() / 10) * 10 + 86400 # Scrape on next day
             nfilename = datestr + '/success/' + task['itemID'] + '-' + str(int(time.time())) + '.html'
             self.save_gecko_page(nfilename)
             with open(datestr + '/success.log','a', encoding = "utf-8") as f:
