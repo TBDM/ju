@@ -54,7 +54,7 @@ class redisCheck():
     redisCli = tbdmDb.tbdmRedis(addrOwner = 'xhuang', auth = True)
 
     def reporter(self):
-        result = {0 : 0, 1 : 0, 2 : 0, "today" : 0, "nearnd" : {}, "total" : 0}
+        result = {0 : 0, 1 : 0, 2 : 0, "today" : 0, "nearnd" : {}, "total" : 0, "dup" : 0}
         nowstamp = time.time()
         todayLeft = (datetime.strptime("23:59:59", "%H:%M:%S") - 
                     datetime.strptime(datetime.fromtimestamp(nowstamp).strftime("%H:%M:%S"), "%H:%M:%S")).seconds
@@ -66,6 +66,10 @@ class redisCheck():
                     tasklist = poppipe.zrange('juList', 0, -1)
                     poppipe.execute()
                     if tasklist:
+                        il = []
+                        for i in tasklist:
+                            il.append(i.decode().split('/')[0])
+                        result["dup"] = len(tasklist) - len(set(il))
                         for item in tasklist:
                                 score = int(item.decode().split('/')[2])
                                 if (score == 0):
@@ -102,6 +106,7 @@ class redisCheck():
         print("Tasks within 1 hour:   " + str(result[1]))
         print("Tasks within 2 hour:   " + str(result[2]))
         print("Tasks within today:    " + str(result["today"]))
+        print("Duplicated tasks num:  " + str(result["dup"]))
         print("\nEarliest task after today: ") 
         for k, v in result["nearnd"].items():
             print(datetime.fromtimestamp(k).strftime("%Y-%m-%d %H:%M:%S") + " : " + str(v))
