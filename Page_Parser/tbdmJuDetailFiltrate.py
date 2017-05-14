@@ -120,9 +120,16 @@ juDetailXpath = {
 #----------function definition----------
 
 def parseJuDetailPage(htmlStr, htmlName):
-    treeObj = etree.HTML(htmlStr)
-    # Here we get a HTML tree so that we can use xpath to find the element we need.
+    try:
+        treeObj = etree.HTML(htmlStr)
+    except Exception as e:
+        juDetailResult['error'] = ['html error']
+        juDetailResult['ju_id'] = htmlName.split('-')[1]
+        juDetailResult['item_id'] = htmlName.split('-')[2]
+        return juDetailResult
 
+    # Here we get a HTML tree so that we can use xpath to find the element we need.
+    juDetailResult['error'] = list()
     for info in juDetailXpath:
         # Find the information we need via the dict we declared.
         isMatched = False
@@ -163,10 +170,8 @@ def parseJuDetailPage(htmlStr, htmlName):
                 ########################################
             
             # print the information for debuging.
-            print(htmlName)
-            print(info)
-            print('\033[1;31mMatch Error\033[0m')
-            return -1
+            juDetailResult['error'].append(info)
+    
     # Do not forget to set ju_id and item_id that are stored in the filename.
     juDetailResult['ju_id'] = htmlName.split('-')[1]
     juDetailResult['item_id'] = htmlName.split('-')[2]

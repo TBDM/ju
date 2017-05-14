@@ -219,6 +219,8 @@ juDetailXpath = {
 def itemType(htmlStr):
     if(re.search('title="淘宝网"', htmlStr) or re.search('淘宝网</title>', htmlStr)):
         return '1'
+    if(re.search('href="//meilihui.tmall.com/"', htmlStr)):
+        return '9'
     if(re.search('title="天猫Tmall.com"', htmlStr)):
         return '2'
     if(re.search('title="天猫超市-chaoshi.tmall.com"', htmlStr) or re.search('<title>【天猫超市】', htmlStr)):
@@ -233,12 +235,12 @@ def itemType(htmlStr):
         return '7'
     if(re.search('title="95095医药馆"', htmlStr) or re.search('//img.alicdn.com/tps/i3/T1Jaa0FQ4bXXcMw42c-148-34.png', htmlStr)):
         return '8'
-    return '9'
+    return '10'
 
 def parseItemDetailPage(htmlStr, htmlName, htmlType):
     treeObj = etree.HTML(htmlStr)
     # Here we get a HTML tree so that we can use xpath to find the element we need.
-
+    juDetailResult['error'] = list()
     for info in juDetailXpath[htmlType]:
         # Find the information we need via the dict we declared.
         isMatched = False
@@ -261,102 +263,94 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             # The information we need but can not be found in juDetailResult
             # So there must be some errors.
 
-            if(htmlType == '2'):
-                if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
-                    if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
-                        print(htmlName)
-                        print(info)
-                        print(juDetailResult)
-                        print(htmlType)
-                        return -3
-
-            # print the information for debuging.
-            print(htmlName)
-            print(info)
-            print(resultList)
-            print(juDetailResult)
-            print(htmlType)
-            print('\033[1;31mMatch Error\033[0m')
-            return -1
+               
+            
+            # add the information for debuging.
+            juDetailResult['error'].append(info)
+            
     # Do not forget to set ju_id and item_id that are stored in the filename.
     juDetailResult['item_id'] = htmlName.split('-')[0]
+    juDetailResult['timestamp'] = htmlName.split('-')[1]
     juDetailResult['item_type'] = itemType(htmlStr)
 
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
-    
-    # From:     \n title \n
-    # To:       title
-    juDetailResult['title'] = juDetailResult['title'].strip()
 
     if(htmlType == '2'):
-        tempTree = etree.HTML(juDetailResult['seller_rate_str'].replace('em', 'em '))
-        temp = [['','',''],['','',''],['','','']]
-        for i in range(3):
-            temp[i][0] = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/em/@title')[0][:-1]
-            rate_class = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/span/b/@class')
-            if(len(rate_class) == 0):
-                temp[i][1] = '1'
-            else:
-                if(rate_class[0] == 'fair'):
-                    temp[i][1] = '0'
-                if(rate_class[0] == 'lower'):
-                    temp[i][1] = '-1'
-            rate_percent = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/span/em/text()')[0]
-            if(rate_percent[0:1] == '-'):
-                temp[i][2] = '0.00'
-            else:
-                temp[i][2] = rate_percent[:-1]
-            juDetailResult['seller_rate'] = temp
-        del(i)
-        del(temp)
-        del(juDetailResult['seller_rate_str'])
-        juDetailResult['seller_name'] = tempTree.xpath('//div[@class="extend"]/ul/li[1]/div/a/text()')
-        juDetailResult['seller_age'] = tempTree.xpath('//div[@class="extend"]/ul/li[3]/div/span[@class="tm-shop-age-num"]/text()')
-        juDetailResult['seller_location'] = tempTree.xpath('//div[@class="extend"]/ul/li[4]/div/text()')
-        juDetailResult['seller_url'] = tempTree.xpath('//div[@class="other"]/a[@class="enter-shop"]/@href')
-        del(tempTree)
+        # From:     \n title \n
+        # To:       title
+        if('title' in juDetailResult):
+            juDetailResult['title'] = juDetailResult['title'].strip()
+        
+        if(len(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')) == 1):
+            if(treeObj.xpath('//strong[@class="sold-out-tit"]/text()')[0] == '此商品已下架'):
+                juDetailResult['error'].append('此商品已下架')
+        
+        if('seller_rate_str' in juDetailResult):
+            tempTree = etree.HTML(juDetailResult['seller_rate_str'].replace('em', 'em '))
+            temp = [['','',''],['','',''],['','','']]
+            for i in range(3):
+                temp[i][0] = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/em/@title')[0][:-1]
+                rate_class = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/span/b/@class')
+                if(len(rate_class) == 0):
+                    temp[i][1] = '1'
+                else:
+                    if(rate_class[0] == 'fair'):
+                        temp[i][1] = '0'
+                    if(rate_class[0] == 'lower'):
+                        temp[i][1] = '-1'
+                rate_percent = tempTree.xpath('//div[@class="shop-rate"]/ul/li[' + str(i + 1) + ']/a/span/em/text()')[0]
+                if(rate_percent[0:1] == '-'):
+                    temp[i][2] = '0.00'
+                else:
+                    temp[i][2] = rate_percent[:-1]
+                juDetailResult['seller_rate'] = temp
+            del(i)
+            del(temp)
+            del(juDetailResult['seller_rate_str'])
+            juDetailResult['seller_name'] = tempTree.xpath('//div[@class="extend"]/ul/li[1]/div/a/text()')
+            juDetailResult['seller_age'] = tempTree.xpath('//div[@class="extend"]/ul/li[3]/div/span[@class="tm-shop-age-num"]/text()')
+            juDetailResult['seller_location'] = tempTree.xpath('//div[@class="extend"]/ul/li[4]/div/text()')
+            juDetailResult['seller_url'] = tempTree.xpath('//div[@class="other"]/a[@class="enter-shop"]/@href')
+            del(tempTree)
 
-        classList = juDetailResult['class_str'].xpath('dl/dt/text()')
-        classDict = dict()
-        for i in range(len(classList)):
-            if(classList[i] == '数量'):
-                if(len(juDetailResult['class_str'].xpath('//em[@id="J_EmStock"]/text()')) == 1):
-                    classDict['数量'] = juDetailResult['class_str'].xpath('//em[@id="J_EmStock"]/text()')[0]
+        if('class_str' in juDetailResult):
+            classList = juDetailResult['class_str'].xpath('dl/dt/text()')
+            classDict = dict()
+            for i in range(len(classList)):
+                if(classList[i] == '数量'):
+                    if(len(juDetailResult['class_str'].xpath('//em[@id="J_EmStock"]/text()')) == 1):
+                        classDict['数量'] = juDetailResult['class_str'].xpath('//em[@id="J_EmStock"]/text()')[0]
+                        continue
+                if(classList[i] == '服务'):
                     continue
-            if(classList[i] == '服务'):
-                continue
-            if(classList[i] == '花呗分期'):
-                continue
-            class_style = list()
-            if(len(juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/@style')) != 0):
-                class_style_raw = juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/@style')
+                if(classList[i] == '花呗分期'):
+                    continue
                 class_style = list()
-                for class_style_str in class_style_raw:
-                    class_style.append(class_style_str.replace('background:url(', '').replace(') center no-repeat;', ''))
-                del(class_style_raw)
-            classDict[classList[i]] = [juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/span/text()'), class_style]
-            del(class_style)
-        juDetailResult['class'] = classDict
-        del(i)
-        del(classDict)
-        del(juDetailResult['class_str'])
+                if(len(juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/@style')) != 0):
+                    class_style_raw = juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/@style')
+                    class_style = list()
+                    for class_style_str in class_style_raw:
+                        class_style.append(class_style_str.replace('background:url(', '').replace(') center no-repeat;', ''))
+                    del(class_style_raw)
+                classDict[classList[i]] = [juDetailResult['class_str'].xpath('dl[' + str(i + 1) + ']/dd/ul/li/a/span/text()'), class_style]
+                del(class_style)
+            juDetailResult['class'] = classDict
+            del(i)
+            del(classDict)
+            del(juDetailResult['class_str'])
         
         # From:     （collect_number人气）
         # To:       collect_number
-        juDetailResult['collect_number'] = juDetailResult['collect_number'][1:-3]
+        if('collect_number' in juDetailResult):
+            juDetailResult['collect_number'] = juDetailResult['collect_number'][1:-3]
 
         if('attribute' in juDetailResult):
             juDetailResult['attribute'] = '-QAQ-'.join(juDetailResult['attribute']).replace('\xa0', ' ').split('-QAQ-')
 
 
-
         if(not('origin_price' in juDetailResult) and not('tmall_price' in juDetailResult)):
-            print(htmlName)
-            print(juDetailResult)
-            print(htmlType)
-            print('\033[1;31mMatch Error\033[0m')
-            return -2
+            juDetailResult['error'].append('no price')
 
 
     # # From:     background-image: url(head_picture_url);
