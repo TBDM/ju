@@ -284,6 +284,7 @@ class Worker():
                     taskdicts.remove(task)
                     continue;
                 if (task['status'] > 15):
+                    success_cnt += 1
                     worklog.info("Track of " + str(task) + " finished. Hooray!")
                     slacker.post_message("Track of " + str(task) + " finished. Hooray!", channel = "worker")
                     with open(datestr +"/finished_task.log", "a+", encoding = "utf-8") as f:
