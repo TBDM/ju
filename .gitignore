@@ -8,8 +8,10 @@ __pycache__/
 *.log
 *.list
 *.tblog
+*.tblog*
 *.lock
 *.html
 tbdmPrivacy.*
 tbdmConfig.*
 tbdmSetting.*
+result.json

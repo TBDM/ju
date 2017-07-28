@@ -34,127 +34,198 @@
 import os
 from lxml import etree
 import re
+import json
 
 #----------model import----------
 
 
 #----------global variables----------
 
-fileLocation = '/data/TBDMdocs/'
+fileLocation = "/data/TBDMdocs/"
 juDetailXpath = {
     '0': {
         'title': {
-            'option': False, 
-            'xpath': ['//h3[@class="tb-main-title"]/text()'], 
+            'option': False,
+            'xpath': ['//h3[@class="tb-main-title"]/text()'],
             'only': [True]
         }
     },
     '1': {
         'title': {
-            'option': False, 
-            'xpath': ['//h3[@class="tb-main-title"]/text()'], 
-            'only': [True]
-        }, 
-        'head_picture': {
-            'option': False, 
-            'xpath': ['//img[@id="J_ImgBooth"]/@src'], 
-            'only': [True]
-        }, 
-        'all_picture': {
-            'option': False, 
-            'xpath': ['//ul[@id="J_UlThumb"]/li/div/a/img/@src'], 
-            'only': [False]
-        }, 
-        
-    },
-    '2': {
-        'seller_rate_str': {
-            'option': False, 
-            'xpath': ['//textarea[@class="ks-datalazyload"]/text()'], 
-            'only': [True]
-        }, 
-        'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['.//*[@id="J_Title"]/h3/text()', ''],
             'only': [True, True]
-        }, 
+        },
         'head_picture': {
-            'option': False, 
-            'xpath': ['//img[@id="J_ImgBooth"]/@src'], 
+            'option': False,
+            'xpath': ['//img[@id="J_ImgBooth"]/@src'],
             'only': [True]
-        }, 
+        },
         'all_picture': {
-            'option': False, 
-            'xpath': ['//ul[@id="J_UlThumb"]/li/a/img/@src'], 
+            'option': False,
+            'xpath': ['//ul[@id="J_UlThumb"]/li/div/a/img/@src'],
             'only': [False]
-        }, 
+        },
         'collect_number': {
-            'option': False, 
-            'xpath': ['//span[@id="J_CollectCount"]/text()'], 
+            'option': False,
+            'xpath': ['.//*[@id="J_Social"]/ul/li[1]/a/em/text()'],
             'only': [True]
-        }, 
+        },
         'privilege': {
             'option': True,
-            'xpath': ['//div[@class="tb-detail-hd"]/p/text()'], 
+            'xpath': ['.//*[@id="J_Title"]/p/text()'],
             'only': [True]
         },
         'sell_point': {
             'option': True,
-            'xpath': ['//div[@class="tb-detail-hd"]/h4[@class="tb-detail-sellpoint"]/text()'], 
+            'xpath': ['//div[@class="tb-detail-hd"]/h4[@class="tb-detail-sellpoint"]/text()'],
             'only': [True]
         },
         'origin_price': {
-            'option': True, 
-            'xpath': ['//dl[@id="J_StrPriceModBox"]/dd/span[@class="tm-price"]/text()', '//dl[@class="tm-tagPrice-panel"]/dd/span[@class="tm-price"]/text()'],
+            'option': True,
+            'xpath': ['.//*[@id="J_StrPrice"]/em[2]/text()', '//dl[@class="tm-tagPrice-panel"]/dd/span[@class="tm-price"]/text()'],
             'only': [True, True]
-        }, 
-        'tmall_price' : {
-            'option': True, 
-            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/span[@class="tm-price"]/text()'],
+        },
+        'tbprom_price' : {
+            'option': True,
+            'xpath': ['.//*[@id="J_PromoPriceNum"]/text()'],
             'only': [True]
         },
         'tmall_price_deposit' : {
-            'option': True, 
+            'option': True,
             'xpath': ['//dl[@class="tm-dj-panel"]/dd/span[@class="tb-wrTuan-deposit"]/text()'],
             'only': [True]
         },
         'tmall_price_reason' : {
-            'option': True, 
-            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/em[2]/text()', '//dl[@id="J_PromoPrice"]/dd/div/img/@src'],
+            'option': True,
+            'xpath': ['.//*[@id="J_PromoType"]/text()', '//dl[@id="J_PromoPrice"]/dd/div/img/@src'],
             'only': [True, True]
         },
         'tmall_price_promotion' : {
-            'option': True, 
+            'option': True,
             'xpath': ['//dl[@class="tm-shopPromo-panel"]/div/dd/text()'],
             'only': [True]
         },
         'sale_number' : {
-            'option': False, 
+            'option': False,
             'xpath': ['//ul[@class="tm-ind-panel"]/li[1]/div/span[@class="tm-count"]/text()', '//div[@id="J_WrtAmount"]/span/em/text()'],
             'only': [True, True]
         },
         'review_number' : {
-            'option': False, 
+            'option': False,
             'xpath': ['//ul[@class="tm-ind-panel"]/li[2]/div/span[@class="tm-count"]/text()'],
             'only': [True]
         },
         'tmall_point' : {
-            'option': False, 
+            'option': False,
             'xpath': ['//ul[@class="tm-ind-panel"]/li[3]/div/a/span[@class="tm-count"]/text()'],
             'only': [True]
         },
         'class_str' : {
-            'option': False, 
+            'option': False,
             'xpath': ['//div[@class="tb-skin"]/div[@class="tb-sku"]'],
             'only': [True]
         },
         'promise' : {
-            'option': False, 
+            'option': False,
             'xpath': ['//ul[@class="tb-serPromise"]/li/a/text()'],
             'only': [False]
         },
         'attribute' : {
-            'option': True, 
+            'option': True,
+            'xpath': ['//ul[@id="J_AttrUL"]/li/text()'],
+            'only': [False]
+        }
+
+    },
+    '2': {
+        'seller_rate_str': {
+            'option': False,
+            'xpath': ['//textarea[@class="ks-datalazyload"]/text()'],
+            'only': [True]
+        },
+        'title': {
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
+            'only': [True, True]
+        },
+        'head_picture': {
+            'option': False,
+            'xpath': ['//img[@id="J_ImgBooth"]/@src'],
+            'only': [True]
+        },
+        'all_picture': {
+            'option': False,
+            'xpath': ['//ul[@id="J_UlThumb"]/li/a/img/@src'],
+            'only': [False]
+        },
+        'collect_number': {
+            'option': False,
+            'xpath': ['//span[@id="J_CollectCount"]/text()'],
+            'only': [True]
+        },
+        'privilege': {
+            'option': True,
+            'xpath': ['//div[@class="tb-detail-hd"]/p/text()'],
+            'only': [True]
+        },
+        'sell_point': {
+            'option': True,
+            'xpath': ['//div[@class="tb-detail-hd"]/h4[@class="tb-detail-sellpoint"]/text()'],
+            'only': [True]
+        },
+        'origin_price': {
+            'option': True,
+            'xpath': ['//dl[@id="J_StrPriceModBox"]/dd/span[@class="tm-price"]/text()', '//dl[@class="tm-tagPrice-panel"]/dd/span[@class="tm-price"]/text()'],
+            'only': [True, True]
+        },
+        'tmall_price' : {
+            'option': True,
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/span[@class="tm-price"]/text()'],
+            'only': [True]
+        },
+        'tmall_price_deposit' : {
+            'option': True,
+            'xpath': ['//dl[@class="tm-dj-panel"]/dd/span[@class="tb-wrTuan-deposit"]/text()'],
+            'only': [True]
+        },
+        'tmall_price_reason' : {
+            'option': True,
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/em[2]/text()', '//dl[@id="J_PromoPrice"]/dd/div/img/@src'],
+            'only': [True, True]
+        },
+        'tmall_price_promotion' : {
+            'option': True,
+            'xpath': ['//dl[@class="tm-shopPromo-panel"]/div/dd/text()'],
+            'only': [True]
+        },
+        'sale_number' : {
+            'option': False,
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[1]/div/span[@class="tm-count"]/text()', '//div[@id="J_WrtAmount"]/span/em/text()'],
+            'only': [True, True]
+        },
+        'review_number' : {
+            'option': False,
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[2]/div/span[@class="tm-count"]/text()'],
+            'only': [True]
+        },
+        'tmall_point' : {
+            'option': False,
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[3]/div/a/span[@class="tm-count"]/text()'],
+            'only': [True]
+        },
+        'class_str' : {
+            'option': False,
+            'xpath': ['//div[@class="tb-skin"]/div[@class="tb-sku"]'],
+            'only': [True]
+        },
+        'promise' : {
+            'option': False,
+            'xpath': ['//ul[@class="tb-serPromise"]/li/a/text()'],
+            'only': [False]
+        },
+        'attribute' : {
+            'option': True,
             'xpath': ['//ul[@id="J_AttrUL"]/li/text()'],
             'only': [False]
         }
@@ -162,52 +233,137 @@ juDetailXpath = {
     },
     '3': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
-    }, 
+        },
+    },
     '4': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
     },
     '5': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
     },
-    '6': {
+    '6': {  # 同天猫
+        'seller_rate_str': {
+            'option': False,
+            'xpath': ['//textarea[@class="ks-datalazyload"]/text()'],
+            'only': [True]
+        },
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
+        'head_picture': {
+            'option': False,
+            'xpath': ['//img[@id="J_ImgBooth"]/@src'],
+            'only': [True]
+        },
+        'all_picture': {
+            'option': False,
+            'xpath': ['//ul[@id="J_UlThumb"]/li/a/img/@src'],
+            'only': [False]
+        },
+        'collect_number': {
+            'option': False,
+            'xpath': ['//span[@id="J_CollectCount"]/text()'],
+            'only': [True]
+        },
+        'privilege': {
+            'option': True,
+            'xpath': ['//div[@class="tb-detail-hd"]/p/text()'],
+            'only': [True]
+        },
+        'sell_point': {
+            'option': True,
+            'xpath': ['//div[@class="tb-detail-hd"]/h4[@class="tb-detail-sellpoint"]/text()'],
+            'only': [True]
+        },
+        'origin_price': {
+            'option': True,
+            'xpath': ['//dl[@id="J_StrPriceModBox"]/dd/span[@class="tm-price"]/text()', '//dl[@class="tm-tagPrice-panel"]/dd/span[@class="tm-price"]/text()'],
+            'only': [True, True]
+        },
+        'tmall_price' : {
+            'option': True,
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/span[@class="tm-price"]/text()'],
+            'only': [True]
+        },
+        'tmall_price_deposit' : {
+            'option': True,
+            'xpath': ['//dl[@class="tm-dj-panel"]/dd/span[@class="tb-wrTuan-deposit"]/text()'],
+            'only': [True]
+        },
+        'tmall_price_reason' : {
+            'option': True,
+            'xpath': ['//dl[@id="J_PromoPrice"]/dd/div/em[2]/text()', '//dl[@id="J_PromoPrice"]/dd/div/img/@src'],
+            'only': [True, True]
+        },
+        'tmall_price_promotion' : {
+            'option': True,
+            'xpath': ['//dl[@class="tm-shopPromo-panel"]/div/dd/text()'],
+            'only': [True]
+        },
+        'sale_number' : {
+            'option': False,
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[1]/div/span[@class="tm-count"]/text()', '//div[@id="J_WrtAmount"]/span/em/text()'],
+            'only': [True, True]
+        },
+        'review_number' : {
+            'option': False,
+            'xpath': ['//ul[@class="tm-ind-panel"]/li[2]/div/span[@class="tm-count"]/text()'],
+            'only': [True]
+        },
+        # 'tmall_point' : {
+        #     'option': False,
+        #     'xpath': ['//ul[@class="tm-ind-panel"]/li[3]/div/a/span[@class="tm-count"]/text()'],
+        #     'only': [True]
+        # },
+        'class_str' : {
+            'option': False,
+            'xpath': ['//div[@class="tb-skin"]/div[@class="tb-sku"]'],
+            'only': [True]
+        },
+        'promise' : {
+            'option': False,
+            'xpath': ['//ul[@class="tb-serPromise"]/li/a/text()'],
+            'only': [False]
+        },
+        'attribute' : {
+            'option': True,
+            'xpath': ['//ul[@id="J_AttrUL"]/li/text()'],
+            'only': [False]
+        }
     },
     '7': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
     },
     '8': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
     },
     '9': {
         'title': {
-            'option': False, 
-            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'], 
+            'option': False,
+            'xpath': ['//div[@class="tb-detail-hd"]/h1/a/text()', '//div[@class="tb-detail-hd"]/h1/text()'],
             'only': [True, True]
-        }, 
+        },
     }
 }
 
@@ -276,7 +432,7 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
 
-    if(htmlType == '2'):
+    if(htmlType == '2' or htmlType == '6'):
         # From:     \n title \n
         # To:       title
         if('title' in juDetailResult):
@@ -390,18 +546,36 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
 #----------main function----------
 
 if __name__ == "__main__":
-    for date in os.listdir(fileLocation):
-        # Filtrate the page day by day.
-        if(os.path.isdir(fileLocation + date) and len(date) == 8 and re.match('^([0-9]{8})$', date)):
-            # Only if the path is a direction and the folder name is like YYYYMMDD can it be parsed.
-            for juPage in os.listdir(fileLocation + date + '/success/'):
-                juDetailResult = dict()
-                # the dict juDetailResult is used to store the content we parsed temporarily.
-                if(len(juPage.split('-'))== 3 and juPage.split('-')[2] == 'filtered.html'):
-                    # Item detail page will be named like ItemID-Timestrap-filtered.html
-                    pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
-                    pageStr = pageObj.read()
-                    if(itemType(pageStr) == '2'):
-                        print(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
-                else:
-                    continue
+    i = 0
+    j = 0
+    result = dict()
+    result['tmall'] = list()
+    result['tmall_hk'] = list()
+    with open("result.json", 'w', encoding='utf-8') as f:
+        for date in os.listdir(fileLocation):
+            print(date)
+            # Filtrate the page day by day.
+            if(os.path.isdir(fileLocation + date) and len(date) == 8 and re.match('^([0-9]{8})$', date)):
+                # Only if the path is a direction and the folder name is like YYYYMMDD can it be parsed.
+                for juPage in os.listdir(fileLocation + date + '/success/'):
+                    juDetailResult = dict()
+                    # the dict juDetailResult is used to store the content we parsed temporarily.
+                    if(len(juPage.split('-'))== 3 and juPage.split('-')[2] == 'filtered.html'):
+                        # Item detail page will be named like ItemID-Timestrap-filtered.html
+                        pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
+                        pageStr = pageObj.read()
+                        if(itemType(pageStr) == '2'):
+                            print("Parsing" + juPage.split('-')[0])
+                            result['tmall'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            i = i+1
+                        elif(itemType(pageStr) == '6'):
+                            print("Parsing" + juPage.split('-')[0])
+                            result['tmall_hk'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            i = i+1
+                        j = j + 1
+                        if(j == 2):
+                            break
+                    else:
+                        continue
+        f.write(json.dumps(result, ensure_ascii=False))
+    print(str(i) + '/' + str(j) + "Parsed")
