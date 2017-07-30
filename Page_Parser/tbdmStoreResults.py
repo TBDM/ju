@@ -14,12 +14,6 @@ tbdmDb = tbdmDatabase()
 mongoCli = tbdmDb.tbdmMongo(addrOwner = 'xzliu', authDb = 'tbdm')
 mongod = mongoCli.tbdm
 
-def getCollection(db, item_type):
-	if(item_type == 'tmall'):
-		co = db.tmall
-	elif(item_type == 'tmall_hk'):
-		co = db.tmall_hk
-	return co
 
 def storeResult(db, file):
 	total = {}
@@ -28,13 +22,12 @@ def storeResult(db, file):
 		try:
 			res = json.loads(f.read())
 			for item_type in res:
-				co = getCollection(db, item_type)
-				bulk = co.initialize_unordered_bulk_op()
+				bulk = db[item_type].initialize_unordered_bulk_op()
 				for item in res[item_type]:
-					if(not co.find_one({'item_id' : item['item_id']})):
+					if(not db[item_type].find_one({'item_id' : item['item_id'], 'timestamp': item['timestamp']})):
 						print('hit: ' + item_type + '-Q.Q-' + item['item_id'])
 						item_num += 1
-						bulk.find({'item_id' : item['item_id']}).upsert().update_one({'$setOnInsert' : item})
+						bulk.insert(item)
 				try:
 					total[item_type] = item_num
 					if(item_num > 0):
