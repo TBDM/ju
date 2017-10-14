@@ -375,12 +375,14 @@ juDetailXpath = {
 def itemType(htmlStr):
     if(re.search('title="淘宝网"', htmlStr) or re.search('淘宝网</title>', htmlStr)):
         return '1'
+        #魅力惠
     if(re.search('href="//meilihui.tmall.com/"', htmlStr)):
         return '9'
     if(re.search('title="天猫Tmall.com"', htmlStr)):
         return '2'
     if(re.search('title="天猫超市-chaoshi.tmall.com"', htmlStr) or re.search('<title>【天猫超市】', htmlStr)):
         return '3'
+        #天猫国际官方直营
     if(re.search('<a class="sslogo" href="//jinkou.tmall.com"', htmlStr) or re.search('https://gw.alicdn.com/tps/TB1u4pXPXXXXXX4XpXXXXXXXXXX-908-116.png', htmlStr)):
         return '4'
     if(re.search('title="喵鲜生-全球健康好味道"', htmlStr)):
@@ -548,6 +550,7 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
 if __name__ == "__main__":
     i = 0
     j = 0
+    failed = {'淘宝':[],'天猫超市':[],'天猫国际官方直营':[],'喵鲜生':[],'天猫美妆':[],'95095医药馆':[],'魅力惠':[]}
     result = dict()
     result['tmall'] = list()
     result['tmall_hk'] = list()
@@ -565,17 +568,44 @@ if __name__ == "__main__":
                         pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
                         pageStr = pageObj.read()
                         if(itemType(pageStr) == '2'):
-                            print("Parsing" + juPage.split('-')[0])
+                            print('parsing 天猫-'+juPage.split('-')[0])
                             result['tmall'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
                             i = i+1
+                            print('done.')
                         elif(itemType(pageStr) == '6'):
-                            print("Parsing" + juPage.split('-')[0])
+                            print('parsing 天猫国际-'+juPage.split('-')[0])
                             result['tmall_hk'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
                             i = i+1
+                            print('done.')
+                        elif(itemType(pageStr) == '1'):
+                            failed['淘宝'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '3'):
+                            failed['天猫超市'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '4'):
+                            failed['天猫国际官方直营'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '5'):
+                            failed['喵鲜生'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '7'):
+                            failed['天猫美妆'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '8'):
+                            failed['95095医药馆'].append(juPage.split('-')[0])
+                        elif(itemType(pageStr) == '9'):
+                            failed['魅力惠'].append(juPage.split('-')[0])
+                        # if(j == 2):
+                            # break
+                        else:
+                            print('Unkown-'+juPage.split('-')[0])
                         j = j + 1
-                        if(j == 2):
-                            break
                     else:
                         continue
         f.write(json.dumps(result, ensure_ascii=False))
     print(str(i) + '/' + str(j) + "Parsed")
+    print('###############################')
+    print('There are '+str(j-i)+' items failed:')
+    print('###############################')
+    for i in failed:
+        if(failed[i]):
+            print(i+':')
+            for j in failed[i]:
+                print('Item id: '+j)
+            print('###############################')
