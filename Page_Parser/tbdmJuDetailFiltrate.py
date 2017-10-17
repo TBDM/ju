@@ -34,13 +34,17 @@
 import os
 from lxml import etree
 import re
+import json
 
 #----------model import----------
-
+from tbdmLogging import tbdmLogger
 
 #----------global variables----------
 
+parseLog = tbdmLogger('parse_ju_log', loglevel = 30).log
+
 fileLocation = '/data/TBDMdocs/'
+# We use the following xpath patterns to locate the elements we need.
 juDetailXpath = {
     'title': {
         'option': False, 
@@ -220,17 +224,26 @@ def parseJuDetailPage(htmlStr, htmlName):
 #----------main function----------
 
 if __name__ == "__main__":
-    for date in os.listdir(fileLocation):
-        # Filtrate the page day by day.
-        if(os.path.isdir(fileLocation + date) and len(date) == 8 and re.match('^([0-9]{8})$', date)):
-            # Only if the path is a direction and the folder name is like YYYYMMDD can it be parsed.
-            for juPage in os.listdir(fileLocation + date + '/success/'):
-                juDetailResult = dict()
-                # the dict juDetailResult is used to store the content we parsed temporarily.
-                if(juPage[0:8] == 'juDetail'):
-                    # Ju detail page will be named like juDetail-JuID-ItemID-Timestrap.html
-                    pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
-                    pageStr = pageObj.read()
-                    print(parseJuDetailPage(pageStr, juPage))
-                else:
-                    continue
+    result  = []
+    with open('ju_result.json', 'w') as f:
+        for date in os.listdir(fileLocation):
+            print(date)
+            # Filtrate the page day by day.
+            if(os.path.isdir(fileLocation + date) and len(date) == 8 and re.match('^([0-9]{8})$', date)):
+                # Only if the path is a direction and the folder name is like YYYYMMDD can it be parsed.
+                for juPage in os.listdir(fileLocation + date + '/success/'):
+                    juDetailResult = dict()
+                    # the dict juDetailResult is used to store the content we parsed temporarily.
+                    if(juPage[0:8] == 'juDetail'):
+                        # Ju detail page will be named like juDetail-JuID-ItemID-Timestrap.html
+                        pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
+                        pageStr = pageObj.read()
+                        result.append(parseJuDetailPage(pageStr, juPage))
+                        if(len(result) > 1000):
+                            for i in range(len(result)):
+                                f.write(json.dumps(result[i], ensure_ascii=False) + '\n')
+                            result = []
+                    else:
+                        continue
+        for i in range(len(result)):
+            f.write(json.dumps(result[i], ensure_ascii=False) + '\n')

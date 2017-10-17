@@ -38,10 +38,13 @@ import json
 
 #----------model import----------
 
+from tbdmLogging import tbdmLogger
 
 #----------global variables----------
 
-fileLocation = "D:\\"
+parseLog = tbdmLogger('parse_item_log', loglevel = 20).log
+
+fileLocation = "/data/TBDMdocs/"
 juDetailXpath = {
     '0': {
         'title': {
@@ -432,8 +435,10 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             
     # Do not forget to set ju_id and item_id that are stored in the filename.
     juDetailResult['item_id'] = htmlName.split('-')[0]
+    # print(juDetailResult['item_id'])
     juDetailResult['timestamp'] = htmlName.split('-')[1]
     juDetailResult['item_type'] = itemType(htmlStr)
+    # print(itemType(htmlStr))
 
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
@@ -479,9 +484,15 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             else:
                 tbShopRate=[]
                 tempTree = juDetailResult['seller_rate_str']
-                tbShopHeader = tempTree.xpath('./a/img/@src')
-                tbShopAge = tempTree.xpath('//div[@class="tb-shop-age-content"]')[0]
-                tbShopAge = "".join(tbShopAge.xpath('string(.)').split())
+                # print(tempTree)
+                if(tempTree.xpath('./a/img/@src')):
+                    tbShopHeader = tempTree.xpath('./a/img/@src')
+                # print(tempTree.xpath('//div[@class="tb-shop-age-content"]'))
+                if(tempTree.xpath('//div[@class="tb-shop-age-content"]')):
+                    tbShopAge = tempTree.xpath('//div[@class="tb-shop-age-content"]')[0]
+                    tbShopAge = "".join(tbShopAge.xpath('string(.)').split())
+                else:
+                    tbShopAge = ""
                 tbShopName = "".join(tempTree.xpath('//div[@class="tb-shop-name"]')[0].xpath('string(.)').split())
                 # tbShopRank = tempTree.xpath('//div[@class="tb-shop-rank tb-rank-cap"]/dl/dt/text()')[0].strip()
                 # tbShopRank = tbShopRank + str(len(tempTree.xpath('//div[@class="tb-shop-rank tb-rank-cap"]/dl/dd/a/i')))
@@ -491,8 +502,9 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
                 for i in range(len(tbShopRateEle)):
                     # print(tbShopRateEle[i].xpath('string(.)').split())
                     tbShopRate.append(tbShopRateEle[i].xpath('string(.)'))
-                juDetailResult['tb_shop_header'] = tbShopHeader
-                juDetailResult['tb_shop_age'] = tbShopAge
+                juDetailResult['tb_shop_header'] = tbShopHeader 
+                if(tbShopAge != ''):
+                    juDetailResult['tb_shop_age'] = tbShopAge
                 juDetailResult['tb_shop_name'] = tbShopName
                 # juDetailResult['tb_shop_rank'] = tbShopRank
                 juDetailResult['tb_shop_seller'] = tbShopSeller
@@ -616,12 +628,9 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
 if __name__ == "__main__":
     i = 0
     j = 0
+    result = []
     failed = {'淘宝':[],'天猫超市':[],'天猫国际官方直营':[],'喵鲜生':[],'天猫美妆':[],'95095医药馆':[],'魅力惠':[]}
-    result = dict()
-    result['tmall'] = list()
-    result['tmall_hk'] = list()
-    result['tb'] = []
-    with open("result.json", 'w', encoding='utf-8') as f:
+    with open("result.json", 'w+', encoding='utf-8') as f:
         for date in os.listdir(fileLocation):
             print(date)
             # Filtrate the page day by day.
@@ -635,20 +644,23 @@ if __name__ == "__main__":
                         pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
                         pageStr = pageObj.read()
                         if(itemType(pageStr) == '2'):
-                            print('parsing 天猫-'+juPage.split('-')[0])
-                            # result['tmall'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            parseLog.info('parsing 天猫-'+juPage.split('-')[0])
+                            result.append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            # f.writelines(json.dumps(parseItemDetailPage(pageStr, juPage, itemType(pageStr)), ensure_ascii=False))
                             i = i+1
-                            print('done.')
+                            parseLog.info('done.')
                         elif(itemType(pageStr) == '6'):
-                            print('parsing 天猫国际-'+juPage.split('-')[0])
-                            # result['tmall_hk'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            parseLog.info('parsing 天猫国际-'+juPage.split('-')[0])
+                            result.append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            # f.writelines(json.dumps(parseItemDetailPage(pageStr, juPage, itemType(pageStr)), ensure_ascii=False))
                             i = i+1
-                            print('done.')
+                            parseLog.info('done.')
                         elif(itemType(pageStr) == '1'):
-                            print('parsing 淘宝-'+juPage.split('-')[0])
-                            result['tb'].append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            parseLog.info('parsing 淘宝-'+juPage.split('-')[0])
+                            result.append(parseItemDetailPage(pageStr, juPage, itemType(pageStr)))
+                            # f.writelines(json.dumps(parseItemDetailPage(pageStr, juPage, itemType(pageStr)), ensure_ascii=False))
                             i = i+1
-                            print('done.')
+                            parseLog.info('done.')
                             # failed['淘宝'].append(juPage.split('-')[0])
                         elif(itemType(pageStr) == '3'):
                             failed['天猫超市'].append(juPage.split('-')[0])
@@ -662,21 +674,25 @@ if __name__ == "__main__":
                             failed['95095医药馆'].append(juPage.split('-')[0])
                         elif(itemType(pageStr) == '9'):
                             failed['魅力惠'].append(juPage.split('-')[0])
-                        # if(j == 2):
+                        if(len(result) > 1000):
+                            for i in range(len(result)):
+                                f.write(json.dumps(result[i], ensure_ascii=False) + '\n')
+                            result = []
                             # break
                         else:
-                            print('Unkown-'+juPage.split('-')[0])
+                            parseLog.info('Unkown-'+juPage.split('-')[0])
                         j = j + 1
                     else:
                         continue
-        f.write(json.dumps(result, ensure_ascii=False))
-    print(str(i) + '/' + str(j) + "Parsed")
-    print('###############################')
-    print('There are '+str(j-i)+' items failed:')
-    print('###############################')
+        for i in range(len(result)):
+            f.write(json.dumps(result[i], ensure_ascii=False) + '\n')
+    parseLog.info(str(i) + '/' + str(j) + "Parsed")
+    parseLog.info('###############################')
+    parseLog.info('There are '+str(j-i)+' items failed:')
+    parseLog.info('###############################')
     for i in failed:
         if(failed[i]):
-            print(i+':')
+            parseLog.info(i+':')
             for j in failed[i]:
-                print('Item id: '+j)
-            print('###############################')
+                parseLog.info('Item id: '+j)
+            parseLog.info('###############################')
