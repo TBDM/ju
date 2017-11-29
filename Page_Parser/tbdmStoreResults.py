@@ -22,10 +22,10 @@ def storeResult(db, file, type):
             bulk = db[collection].initialize_unordered_bulk_op()
             for line in f:
                 item = json.loads(line)
-                if(type == 'ju'):
+                if(type == 'ju' and len(item['error']) == 0):
                     print('Storing ju page '+item['ju_id'])
                     bulk.find({'ju_id': item['ju_id'], 'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update_one({'$setOnInsert':item})
-                elif(type == 'item'):
+                elif(type == 'item' and len(item['error']) == 0):
                     print('Storing item page ' + item['item_id'])
                     bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
                 item_num += 1

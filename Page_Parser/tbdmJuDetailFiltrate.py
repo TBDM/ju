@@ -55,6 +55,7 @@ def parseJuDetailPage(htmlStr, htmlName, juDetailXpath):
         juDetailResult['error'] = ['html error']
         juDetailResult['ju_id'] = htmlName.split('-')[1]
         juDetailResult['item_id'] = htmlName.split('-')[2]
+        juDetailResult['timestamp'] = htmlName.split('-')[3][:-5]
         return juDetailResult
 
     # Here we get a HTML tree so that we can use xpath to find the element we need.
