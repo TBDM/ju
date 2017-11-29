@@ -106,7 +106,7 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
     juDetailResult['item_id'] = htmlName.split('-')[0]
     # print(juDetailResult['item_id'])
     juDetailResult['timestamp'] = htmlName.split('-')[1]
-    juDetailResult['item_type'] = itemType(htmlStr)
+    juDetailResult['item_type'] = htmlType
     # print(itemType(htmlStr))
 
     # Here we have parsed all the useful data

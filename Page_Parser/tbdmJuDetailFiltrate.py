@@ -104,7 +104,7 @@ def parseJuDetailPage(htmlStr, htmlName, juDetailXpath):
     # Do not forget to set ju_id and item_id **and timestamp**that are stored in the filename.
     juDetailResult['ju_id'] = htmlName.split('-')[1]
     juDetailResult['item_id'] = htmlName.split('-')[2]
-    juDetailResult['timestamp'] = htmlName.split('-')[3]
+    juDetailResult['timestamp'] = htmlName.split('-')[3][:-5]
     
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
