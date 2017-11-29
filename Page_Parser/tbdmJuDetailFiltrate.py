@@ -39,6 +39,7 @@ import json
 from lxml import etree
 
 #----------model import----------
+sys.apth.append('../')
 from Scaffold.tbdmLogging import tbdmLogger
 
 #----------global variables----------

@@ -32,6 +32,8 @@ import traceback
 
 from lxml import etree
 
+sys.apth.append('../')
+
 from Scaffold.tbdmLogging import tbdmLogger
 
 # ----------model import----------
