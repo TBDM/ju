@@ -22,16 +22,19 @@ def storeResult(db, file, type):
             bulk = db[collection].initialize_unordered_bulk_op()
             for line in f:
                 if(line != None):
-                    item = json.loads(line)
-                    if(type == 'ju' and len(item['error']) == 0):
-                        print('Storing ju page '+item['ju_id'])
-                        bulk.find({'ju_id': item['ju_id'], 'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update_one({'$setOnInsert':item})
-                    elif(type == 'item' and len(item['error']) == 0):
-                        print('Storing item page ' + item['item_id'])
-                        bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
-                    else:
-                        continue
-                    item_num += 1
+                    try:
+                        item = json.loads(line)
+                        if(type == 'ju' and len(item['error']) == 0):
+                            print('Storing ju page '+item['ju_id'])
+                            bulk.find({'ju_id': item['ju_id'], 'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update_one({'$setOnInsert':item})
+                        elif(type == 'item' and len(item['error']) == 0):
+                            print('Storing item page ' + item['item_id'])
+                            bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
+                        else:
+                            continue
+                        item_num += 1
+                    except Exception as _Eall:
+                        traceback.print_exc()
                 else:
                     continue
         except Exception as _Eall:
