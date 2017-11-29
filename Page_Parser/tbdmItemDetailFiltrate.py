@@ -290,7 +290,7 @@ if __name__ == "__main__":
         sys.exit(0)
     fileLocation = sys.argv[1]
     fileName = sys.argv[2]
-    with open('item_xpath.json','w',encoding='utf-8') as f:
+    with open('item_xpath.json','r',encoding='utf-8') as f:
         juDetailXpath = json.load(f)
     # fileLocation = 'D:\\test\\'
     item_num = 0
