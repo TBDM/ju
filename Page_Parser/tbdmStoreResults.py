@@ -5,7 +5,7 @@ import json
 import sys
 import traceback
 
-sys.apth.append('../')
+sys.path.append('../')
 
 from Conf.tbdmSetting import tbdmDatabase
 

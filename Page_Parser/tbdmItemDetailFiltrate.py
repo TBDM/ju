@@ -32,7 +32,7 @@ import traceback
 
 from lxml import etree
 
-sys.apth.append('../')
+sys.path.append('../')
 
 from Scaffold.tbdmLogging import tbdmLogger
 
