@@ -1,9 +1,12 @@
+/.idea
 !.gitignore
 *.pyc
 __pycache__/
 
 2017*/
 *-test/
+/Conf/*
+.idea
 
 *.log
 *.list
@@ -15,5 +18,6 @@ tbdmPrivacy.*
 tbdmConfig.*
 tbdmConfig_py.*
 tbdmSetting.*
-result.json
-ju_result.json
+result*.json
+ju_*.json
+item_*.json

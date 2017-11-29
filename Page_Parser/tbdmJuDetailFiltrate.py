@@ -32,98 +32,22 @@
 #----------model import----------
 
 import os
-from lxml import etree
+import sys
 import re
 import json
 
+from lxml import etree
+
 #----------model import----------
-from tbdmLogging import tbdmLogger
+from Scaffold.tbdmLogging import tbdmLogger
 
 #----------global variables----------
 
-parseLog = tbdmLogger('parse_ju_log', loglevel = 30).log
-
-fileLocation = '/data/TBDMdocs/'
-# We use the following xpath patterns to locate the elements we need.
-juDetailXpath = {
-    'title': {
-        'option': False, 
-        'xpath': ['//h2[@class="title"]/text()'], 
-        'only': [True]
-    }, 
-    'type': {
-        'option': False, 
-        'xpath': ['//div[@class="header clearfix"]/ul/li/a/text()', '//div[@class="header clearfix"]/a/img/@src'], 
-        'only': [False, True]
-    }, 
-    'head_picture': {
-        'option': False, 
-        'xpath': ['//div[@class="item-pic-wrap"]/img/@src', '//div[@class="J_zoom pic "]/@style', '//div[@class="J_zoom pic"]/@style'], 
-        'only': [True, True, True]
-    }, 
-    'all_picture': {
-        'option': True, 
-        'xpath': ['//ul[@class="thumbnails"]/li/img/@data-big'], 
-        'only': [False]
-    }, 
-    'privilege': {
-        'option': False, 
-        'xpath': ['//div[@class="biztag"]/label/text()', '//div[@class="biztag "]/label/text()'], 
-        'only': [False, False]
-    }, 
-    'description': {
-        'option': False, 
-        'xpath': ['//div[@class="description"]/ul/li/text()'], 
-        'only': [False]
-    }, 
-    'start_time': {
-        'option': True, 
-        'xpath': ['//div[@class="ju-clock J_juItemTimer"]/@data-targettime'], 
-        'only': [True]
-    }, 
-    'ju_price': {
-        'option': False, 
-        'xpath': ['//span[@class="extra currentPrice"]/span[@class="J_actPrice"]/text()'], 
-        'only': [True]
-    }, 
-    'origin_price': {
-        'option': True, 
-        'xpath': ['//del[@class="originPrice"]/text()'], 
-        'only': [True]
-    }, 
-    'sale': {
-        'option': True, 
-        'xpath': ['//span[@class="soldnum"]/em/text()'], 
-        'only': [True]
-    }, 
-    'seller_name': {
-        'option': False, 
-        'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/text()'], 
-        'only': [True]
-    }, 
-    'seller_url': {
-        'option': False, 
-        'xpath': ['//div[@class="tit  J_sellerInfoTit"]/a/@href'], 
-        'only': [True]
-    }, 
-    'seller_rate': {
-        'option': False, 
-        'xpath': ['//div[@class="con"]/table/tbody/tr[2]/td/text()'], 
-        'only': [False]
-    }, 
-    'seller_promise': {
-        'option': False, 
-        'xpath': ['//div[@class="con"]/ul[@class="clearfix J_PromiseCon"]/li/a/span/text()'], 
-        'only': [False]
-    }
-}
-
-#----------global variables----------
-
+parseLog = tbdmLogger('./Logs/parse_ju_log', loglevel = 30).log
 
 #----------function definition----------
 
-def parseJuDetailPage(htmlStr, htmlName):
+def parseJuDetailPage(htmlStr, htmlName, juDetailXpath):
     try:
         treeObj = etree.HTML(htmlStr)
     except Exception as e:
@@ -176,9 +100,10 @@ def parseJuDetailPage(htmlStr, htmlName):
             # print the information for debuging.
             juDetailResult['error'].append(info)
     
-    # Do not forget to set ju_id and item_id that are stored in the filename.
+    # Do not forget to set ju_id and item_id **and timestamp**that are stored in the filename.
     juDetailResult['ju_id'] = htmlName.split('-')[1]
     juDetailResult['item_id'] = htmlName.split('-')[2]
+    juDetailResult['timestamp'] = htmlName.split('-')[3]
     
     # Here we have parsed all the useful data
     # What we need to do next is to clean the data
@@ -224,8 +149,15 @@ def parseJuDetailPage(htmlStr, htmlName):
 #----------main function----------
 
 if __name__ == "__main__":
+    if(not len(sys.argv[2:])):
+        print('Usage: '+sys.argv[0]+' [origin file] [outfile]')
+        sys.exit(0)
+    fileLocation = sys.argv[1]
+    fileName = sys.argv[2]
+    with open('ju_xpath.json', 'r', encoding='utf-8') as f:
+        juDetailXpath = json.load(f)
     result  = []
-    with open('ju_result.json', 'w') as f:
+    with open(fileName, 'w') as f:
         for date in os.listdir(fileLocation):
             print(date)
             # Filtrate the page day by day.
@@ -238,7 +170,7 @@ if __name__ == "__main__":
                         # Ju detail page will be named like juDetail-JuID-ItemID-Timestrap.html
                         pageObj = open(fileLocation + date + '/success/' + juPage, 'r', encoding='UTF-8')
                         pageStr = pageObj.read()
-                        result.append(parseJuDetailPage(pageStr, juPage))
+                        result.append(parseJuDetailPage(pageStr, juPage, juDetailXpath))
                         if(len(result) > 1000):
                             for i in range(len(result)):
                                 f.write(json.dumps(result[i], ensure_ascii=False) + '\n')
