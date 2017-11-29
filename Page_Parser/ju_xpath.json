@@ -1,0 +1,136 @@
+{
+  "title": {
+    "option": false,
+    "xpath": [
+      "//h2[@class=\"title\"]/text()"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "type": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"header clearfix\"]/ul/li/a/text()",
+      "//div[@class=\"header clearfix\"]/a/img/@src"
+    ],
+    "only": [
+      false,
+      true
+    ]
+  },
+  "head_picture": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"item-pic-wrap\"]/img/@src",
+      "//div[@class=\"J_zoom pic \"]/@style",
+      "//div[@class=\"J_zoom pic\"]/@style"
+    ],
+    "only": [
+      true,
+      true,
+      true
+    ]
+  },
+  "all_picture": {
+    "option": true,
+    "xpath": [
+      "//ul[@class=\"thumbnails\"]/li/img/@data-big"
+    ],
+    "only": [
+      false
+    ]
+  },
+  "privilege": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"biztag\"]/label/text()",
+      "//div[@class=\"biztag \"]/label/text()"
+    ],
+    "only": [
+      false,
+      false
+    ]
+  },
+  "description": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"description\"]/ul/li/text()"
+    ],
+    "only": [
+      false
+    ]
+  },
+  "start_time": {
+    "option": true,
+    "xpath": [
+      "//div[@class=\"ju-clock J_juItemTimer\"]/@data-targettime"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "ju_price": {
+    "option": false,
+    "xpath": [
+      "//span[@class=\"extra currentPrice\"]/span[@class=\"J_actPrice\"]/text()"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "origin_price": {
+    "option": true,
+    "xpath": [
+      "//del[@class=\"originPrice\"]/text()"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "sale": {
+    "option": true,
+    "xpath": [
+      "//span[@class=\"soldnum\"]/em/text()"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "seller_name": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"tit  J_sellerInfoTit\"]/a/text()"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "seller_url": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"tit  J_sellerInfoTit\"]/a/@href"
+    ],
+    "only": [
+      true
+    ]
+  },
+  "seller_rate": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"con\"]/table/tbody/tr[2]/td/text()"
+    ],
+    "only": [
+      false
+    ]
+  },
+  "seller_promise": {
+    "option": false,
+    "xpath": [
+      "//div[@class=\"con\"]/ul[@class=\"clearfix J_PromiseCon\"]/li/a/span/text()"
+    ],
+    "only": [
+      false
+    ]
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "0": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//h3[@class=\"tb-main-title\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    }
+  },
+  "1": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_Title\"]/h3/text()",
+        ""
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "head_picture": {
+      "option": false,
+      "xpath": [
+        "//img[@id=\"J_ImgBooth\"]/@src"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "all_picture": {
+      "option": false,
+      "xpath": [
+        "//ul[@id=\"J_UlThumb\"]/li/div/a/img/@src"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "collect_number": {
+      "option": false,
+      "xpath": [
+        ".//*[@id=\"J_Social\"]/ul/li[1]/a/em/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "privilege": {
+      "option": true,
+      "xpath": [
+        ".//*[@id=\"J_Title\"]/p/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sell_point": {
+      "option": true,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h4[@class=\"tb-detail-sellpoint\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "origin_price": {
+      "option": true,
+      "xpath": [
+        ".//*[@id=\"J_StrPrice\"]/em[2]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tbprom_price": {
+      "option": true,
+      "xpath": [
+        ".//*[@id=\"J_PromoPriceNum\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tb_price_reason": {
+      "option": true,
+      "xpath": [
+        ".//*[@id=\"J_PromoType\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sale_number": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_SellCounter\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "review_number": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_RateCounter\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "class_str": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_isku\"]/div[@class=\"tb-skin\"]"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "promise": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_tbExtra\"]/dl[1]/dd/a/text()"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "attribute": {
+      "option": true,
+      "xpath": [
+        "//*[@id=\"attributes\"]/ul[@class=\"attributes-list\"]"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "seller_rate_str": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J_ShopInfo\"]"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tb_shop_location": {
+      "option": false,
+      "xpath": [
+        "//*[@id=\"J-From\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    }
+  },
+  "2": {
+    "seller_rate_str": {
+      "option": false,
+      "xpath": [
+        "//textarea[@class=\"ks-datalazyload\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "head_picture": {
+      "option": false,
+      "xpath": [
+        "//img[@id=\"J_ImgBooth\"]/@src"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "all_picture": {
+      "option": false,
+      "xpath": [
+        "//ul[@id=\"J_UlThumb\"]/li/a/img/@src"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "collect_number": {
+      "option": false,
+      "xpath": [
+        "//span[@id=\"J_CollectCount\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "privilege": {
+      "option": true,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/p/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sell_point": {
+      "option": true,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h4[@class=\"tb-detail-sellpoint\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "origin_price": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_StrPriceModBox\"]/dd/span[@class=\"tm-price\"]/text()",
+        "//dl[@class=\"tm-tagPrice-panel\"]/dd/span[@class=\"tm-price\"]/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "tmall_price": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/span[@class=\"tm-price\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tmall_price_deposit": {
+      "option": true,
+      "xpath": [
+        "//dl[@class=\"tm-dj-panel\"]/dd/span[@class=\"tb-wrTuan-deposit\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tmall_price_reason": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/em[2]/text()",
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/img/@src"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "tmall_price_promotion": {
+      "option": true,
+      "xpath": [
+        "//dl[@class=\"tm-shopPromo-panel\"]/div/dd/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sale_number": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tm-ind-panel\"]/li[1]/div/span[@class=\"tm-count\"]/text()",
+        "//div[@id=\"J_WrtAmount\"]/span/em/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "review_number": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tm-ind-panel\"]/li[2]/div/span[@class=\"tm-count\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tmall_point": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tm-ind-panel\"]/li[3]/div/a/span[@class=\"tm-count\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "class_str": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-skin\"]/div[@class=\"tb-sku\"]"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "promise": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tb-serPromise\"]/li/a/text()"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "attribute": {
+      "option": true,
+      "xpath": [
+        "//ul[@id=\"J_AttrUL\"]/li/text()"
+      ],
+      "only": [
+        false
+      ]
+    }
+  },
+  "3": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  },
+  "4": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  },
+  "5": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  },
+  "6": {
+    "seller_rate_str": {
+      "option": false,
+      "xpath": [
+        "//textarea[@class=\"ks-datalazyload\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "head_picture": {
+      "option": false,
+      "xpath": [
+        "//img[@id=\"J_ImgBooth\"]/@src"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "all_picture": {
+      "option": false,
+      "xpath": [
+        "//ul[@id=\"J_UlThumb\"]/li/a/img/@src"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "collect_number": {
+      "option": false,
+      "xpath": [
+        "//span[@id=\"J_CollectCount\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "privilege": {
+      "option": true,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/p/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sell_point": {
+      "option": true,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h4[@class=\"tb-detail-sellpoint\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "origin_price": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_StrPriceModBox\"]/dd/span[@class=\"tm-price\"]/text()",
+        "//dl[@class=\"tm-tagPrice-panel\"]/dd/span[@class=\"tm-price\"]/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "tmall_price": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/span[@class=\"tm-price\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tmall_price_deposit": {
+      "option": true,
+      "xpath": [
+        "//dl[@class=\"tm-dj-panel\"]/dd/span[@class=\"tb-wrTuan-deposit\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "tmall_price_reason": {
+      "option": true,
+      "xpath": [
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/em[2]/text()",
+        "//dl[@id=\"J_PromoPrice\"]/dd/div/img/@src"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "tmall_price_promotion": {
+      "option": true,
+      "xpath": [
+        "//dl[@class=\"tm-shopPromo-panel\"]/div/dd/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "sale_number": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tm-ind-panel\"]/li[1]/div/span[@class=\"tm-count\"]/text()",
+        "//div[@id=\"J_WrtAmount\"]/span/em/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    },
+    "review_number": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tm-ind-panel\"]/li[2]/div/span[@class=\"tm-count\"]/text()"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "class_str": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-skin\"]/div[@class=\"tb-sku\"]"
+      ],
+      "only": [
+        true
+      ]
+    },
+    "promise": {
+      "option": false,
+      "xpath": [
+        "//ul[@class=\"tb-serPromise\"]/li/a/text()"
+      ],
+      "only": [
+        false
+      ]
+    },
+    "attribute": {
+      "option": true,
+      "xpath": [
+        "//ul[@id=\"J_AttrUL\"]/li/text()"
+      ],
+      "only": [
+        false
+      ]
+    }
+  },
+  "7": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  },
+  "8": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  },
+  "9": {
+    "title": {
+      "option": false,
+      "xpath": [
+        "//div[@class=\"tb-detail-hd\"]/h1/a/text()",
+        "//div[@class=\"tb-detail-hd\"]/h1/text()"
+      ],
+      "only": [
+        true,
+        true
+      ]
+    }
+  }
+}
