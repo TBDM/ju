@@ -68,7 +68,7 @@ def getItemType(htmlStr):
         return '8'
     return '10'
 
-def parseItemDetailPage(htmlStr, htmlName, htmlType):
+def parseItemDetailPage(htmlStr, htmlName, htmlType, juDetailXpath):
     treeObj = etree.HTML(htmlStr)
     # Here we get a HTML tree so that we can use xpath to find the element we need.
     juDetailResult['error'] = list()
@@ -268,11 +268,11 @@ def parseItemDetailPage(htmlStr, htmlName, htmlType):
             parseLog.error(str(_Eall))
     return juDetailResult
 
-def handleItem(resultList, failedDict, itemType):
-    item = parseItemDetailPage(pageStr, juPage, itemType)
+def handleItem(resultList, failedDict, pageStr, juPage, itemType, juDetailXpath):
+    item = parseItemDetailPage(pageStr, juPage, itemType, juDetailXpath)
     if (item != None):
         resultList.append(item)
-        print('Item ' + item['item_id'] + 'parsed.')
+        print('Item ' + item['item_id'] + ' parsed.')
         return 1
     else:
         failedDict[itemType].append(juPage)
@@ -285,18 +285,19 @@ def handleItem(resultList, failedDict, itemType):
 #----------main function----------
 
 if __name__ == "__main__":
-    if(not len(sys.argv[2:])):
-        print('Usage: '+sys.argv[0]+' [origin file] [outfile]')
-        sys.exit(0)
-    fileLocation = sys.argv[1]
-    fileName = sys.argv[2]
+    # if(not len(sys.argv[2:])):
+    #     print('Usage: '+sys.argv[0]+' [origin file] [outfile]')
+    #     sys.exit(0)
+    # fileLocation = sys.argv[1]
+    # fileName = sys.argv[2]
     with open('item_xpath.json','r',encoding='utf-8') as f:
         juDetailXpath = json.load(f)
-    # fileLocation = 'D:\\test\\'
+    fileName = 'test.json'
+    fileLocation = 'D:\\test\\'
     item_num = 0
     total = 0
     result = []
-    failed = {i:[] for i in range(1,10)}
+    failed = {str(i):[] for i in range(0,10)}
     with open(fileName, 'w+', encoding='utf-8') as f:
         for date in os.listdir(fileLocation):
             print(date)
@@ -311,7 +312,7 @@ if __name__ == "__main__":
                         pageStr = pageObj.read()
                         itemType = getItemType(pageStr)
                         if(itemType in('2','6','1')):
-                            item_num = item_num + handleItem(result,failed,2)
+                            item_num = item_num + handleItem(result,failed,pageStr, juPage,itemType,juDetailXpath)
                         else:
                             pass
                         if(len(result) > 1000):
@@ -325,6 +326,11 @@ if __name__ == "__main__":
                         total = total + 1
                     else:
                         continue
+        try:
+            for item in result:
+                f.write(json.dumps(item, ensure_ascii=False) + '\n')
+        except Exception as _Eall:
+            traceback.print_exc()
     print('###############################')
     print('All work done in ' + fileLocation + '.' + time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time())))
     print('There are ' + str(total - item_num) + '/' + str(total) + ' items failed:(')
@@ -332,8 +338,12 @@ if __name__ == "__main__":
     parseLog.info('All work done in '+ fileLocation +'.')
     parseLog.info('There are '+str(total-item_num)+'/'+str(total)+' items failed:(')
     parseLog.info('###############################')
-    for k,y in failed:
-        print('HTML Type: ' + str(k) + 'info: '+ y)
-        parseLog.error('HTML Type: ' + str(k) + 'info: '+ y)
+    for (k,y) in failed.items():
+        if(len(y) != 0):
+            print('HTML Type: ' + str(k))
+            parseLog.error('HTML Type: ' + str(k))
+            for item in y:
+                print('info: ' + item)
+                parseLog.error('info: '+ item)
     parseLog.info('###############################')
     print('###############################')
