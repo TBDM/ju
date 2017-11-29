@@ -21,16 +21,19 @@ def storeResult(db, file, type):
         try:
             bulk = db[collection].initialize_unordered_bulk_op()
             for line in f:
-                item = json.loads(line)
-                if(type == 'ju' and len(item['error']) == 0):
-                    print('Storing ju page '+item['ju_id'])
-                    bulk.find({'ju_id': item['ju_id'], 'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update_one({'$setOnInsert':item})
-                elif(type == 'item' and len(item['error']) == 0):
-                    print('Storing item page ' + item['item_id'])
-                    bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
+                if(line != None):
+                    item = json.loads(line)
+                    if(type == 'ju' and len(item['error']) == 0):
+                        print('Storing ju page '+item['ju_id'])
+                        bulk.find({'ju_id': item['ju_id'], 'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update_one({'$setOnInsert':item})
+                    elif(type == 'item' and len(item['error']) == 0):
+                        print('Storing item page ' + item['item_id'])
+                        bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
+                    else:
+                        continue
+                    item_num += 1
                 else:
                     continue
-                item_num += 1
         except Exception as _Eall:
             traceback.print_exc()
         try:
@@ -51,4 +54,4 @@ if __name__ == '__main__':
     tbdmDb = tbdmDatabase()
     mongod = tbdmDb.tbdmMongo(addrOwner = 'xmu_local', authDb = 'tbdm')
     res = storeResult(mongod, fileLocation, type)
-    print("Finish " + str(res) + 'At: '+time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time())))
+    print("Finish " + str(res) + ' At: '+time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time())))
