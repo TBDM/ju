@@ -28,6 +28,8 @@ def storeResult(db, file, type):
                 elif(type == 'item' and len(item['error']) == 0):
                     print('Storing item page ' + item['item_id'])
                     bulk.find({'item_id': item['item_id'], 'timestamp': item['timestamp']}).upsert().update({'$setOnInsert':item})
+                else:
+                    continue
                 item_num += 1
         except Exception as _Eall:
             traceback.print_exc()
