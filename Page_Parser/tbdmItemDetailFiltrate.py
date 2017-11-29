@@ -285,15 +285,15 @@ def handleItem(resultList, failedDict, pageStr, juPage, itemType, juDetailXpath)
 #----------main function----------
 
 if __name__ == "__main__":
-    # if(not len(sys.argv[2:])):
-    #     print('Usage: '+sys.argv[0]+' [origin file] [outfile]')
-    #     sys.exit(0)
-    # fileLocation = sys.argv[1]
-    # fileName = sys.argv[2]
+    # fileName = 'test.json'
+    # fileLocation = 'D:\\test\\'
+    if(not len(sys.argv[2:])):
+        print('Usage: '+sys.argv[0]+' [origin file] [outfile]')
+        sys.exit(0)
+    fileLocation = sys.argv[1]
+    fileName = sys.argv[2]
     with open('item_xpath.json','r',encoding='utf-8') as f:
         juDetailXpath = json.load(f)
-    fileName = 'test.json'
-    fileLocation = 'D:\\test\\'
     item_num = 0
     total = 0
     result = []
