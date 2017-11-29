@@ -19,5 +19,5 @@ tbdmConfig.*
 tbdmConfig_py.*
 tbdmSetting.*
 result*.json
-ju_*.json
-item_*.json
+ju_detail_*.json
+item_detail_*.json
